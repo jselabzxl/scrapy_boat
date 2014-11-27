@@ -15,3 +15,9 @@ NEWSPIDER_MODULE = 'scrapy_boat.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'scrapy_boat (+http://www.yourdomain.com)'
+
+ITEM_PIPELINES = [
+    #'scrapy_boat.pipelines.ScrapyBoatPipeline',
+    #'scrapy_boat.pipelines.WeixinCsvPipeline'
+    'scrapy_boat.pipelines.ChuanrenCsvPipeline'
+]
