@@ -14,21 +14,30 @@ HOST_URL = "http://news.baidu.com"
 LIST_URL = HOST_URL + "/ns?word={topic}&pn={offset}&cl=2&ct=1&tn=newsdy&rn={page_count}&ie=utf-8&bt={start_ts}&et={end_ts}"
 
 class BaiduNsSearchSpider(Spider):
-    """usage: scrapy crawl baidu_ns_search -a keywords_file='keywords_corp.txt' --loglevel=INFO
+    """usage: scrapy crawl baidu_ns_search -a keywords_file='keywords_corp_baidu.txt' --loglevel=INFO
     """
     name = "baidu_ns_search"
 
     def __init__(self, keywords_file):
         self.keywords = []
-        f = open('./keywords/' + keywords_file)
+        f = open('../data/keywords/' + keywords_file)
         for line in f:
+            if '!' in line:
+                strip_no_querys = []
+                querys = line.strip().lstrip('(').rstrip(')').split(' | ')
+                for q in querys:
+                    strip_no_querys.append(q.split(' !')[0])
+                strip_no_querys = '(' + ' | '.join(strip_no_querys) + ')'
+                line = strip_no_querys
             keywords_para = quote(line.strip())
             self.keywords.append(keywords_para)
         f.close()
 
         self.page_count = 100
         self.start_ts = self.datetime2ts('2014-11-01 00:00:00')
-        self.end_ts = self.datetime2ts('2014-11-22 00:00:00')
+        self.end_ts = self.datetime2ts('2014-12-01 00:00:00')
+        self.source_website = self.name
+        self.category = keywords_file
 
     def start_requests(self):
         for keyword in self.keywords:
@@ -106,10 +115,10 @@ class BaiduNsSearchSpider(Spider):
                 same_news_num = 0
                 relative_news = None
 
-                news_item = {'title': title, 'url': url, 'same_news_num': same_news_num, 'more_same_link': more_same_link, 'relative_news': relative_news, 'author': author, 'datetime': datetime, 'summary': summary}
+                news_item = {'title': title, 'url': url, 'same_news_num': same_news_num, 'more_same_link': more_same_link, 'relative_news': relative_news, 'user_name': author, 'datetime': datetime, 'summary': summary, 'source_website': self.source_website, 'category': self.category}
 
                 item = ScrapyBoatItem()
-                for key in ScrapyBoatItem.RESP_ITER_KEYS:
+                for key in ScrapyBoatItem.RESP_ITER_KEYS_BAIDU:
                     item[key] = news_item[key]
 
                 if base_item:

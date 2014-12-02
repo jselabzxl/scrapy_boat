@@ -19,5 +19,13 @@ NEWSPIDER_MODULE = 'scrapy_boat.spiders'
 ITEM_PIPELINES = [
     #'scrapy_boat.pipelines.ScrapyBoatPipeline',
     #'scrapy_boat.pipelines.WeixinCsvPipeline'
-    'scrapy_boat.pipelines.ChuanrenCsvPipeline'
+    #'scrapy_boat.pipelines.ChuanrenCsvPipeline'
+    #'scrapy_boat.pipelines.WeixinSearchCsvPipeline'
+    'scrapy_boat.pipelines.MongodbPipeline'
 ]
+
+BOAT_HOST = "219.224.135.46"
+BOAT_PORT = 27019
+BOAT_DB = "boat"
+BOAT_COLLECTION = "boatcol"
+
