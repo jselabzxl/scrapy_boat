@@ -20,7 +20,7 @@ class BaiduNsSearchSpider(Spider):
 
     def __init__(self, keywords_file):
         self.keywords = []
-        f = open('../data/keywords/' + keywords_file)
+        f = open('./source/' + keywords_file)
         for line in f:
             if '!' in line:
                 strip_no_querys = []

@@ -25,7 +25,7 @@ class WeiboApiSearchSpider(BaseSpider):
         self.category = keywords_file
 
     def start_requests(self):
-        f = open('/home/linhao/714/data/keywords/' + self.keywords)
+        f = open('./source/' + self.keywords)
         for line in f:
             if '!' in line:
                 strip_no_querys = []
