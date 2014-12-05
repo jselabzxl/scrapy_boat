@@ -53,20 +53,21 @@ class SogouWeixinSearchSpider(Spider):
 
     def parse(self, response):
         results = []
-
-        resp = response.body
-        items = self.resp2items(resp)
-        results.extend(items)
-
         page = response.meta['page']
         keyword = response.meta['keyword']
-        page += 1
-        search_url = self.get_search_url(keyword, page)
-        log.msg(search_url)
-        request = Request(search_url)
-        request.meta['page'] = page
-        request.meta['keyword'] = keyword
-        results.append(request)
+
+        resp = response.body
+        page_next, items = self.resp2items(resp)
+        results.extend(items)
+
+        if page_next:
+            page += 1
+            search_url = self.get_search_url(keyword, page)
+            log.msg(search_url)
+            request = Request(search_url)
+            request.meta['page'] = page
+            request.meta['keyword'] = keyword
+            results.append(request)
 
         return results
 
@@ -84,6 +85,9 @@ class SogouWeixinSearchSpider(Spider):
         resp = resp.replace("red_beg", "").replace("red_end", "").replace("&mdash;", "")
         soup = BeautifulSoup(resp)
         wx_rbs = soup.findAll("div", {"class": "wx-rb wx-rb3"})
+
+        page_next = False
+
         for wx_rb in wx_rbs:
             post_id = wx_rb.get("d")
 
@@ -100,6 +104,8 @@ class SogouWeixinSearchSpider(Spider):
             post_source_url = HOST_URL + s_p_a.get("href")
             post_source_name = s_p_a.get("title")
             timestamp = int(s_p_div.get("t"))
+            if timestamp < self.start_ts:
+                page_next = False
             date = self.ts2date(timestamp)
             datetime = self.ts2datetime(timestamp)
             source_website = self.source_website
@@ -120,7 +126,7 @@ class SogouWeixinSearchSpider(Spider):
 
             weixins.append(weixin)
 
-        return weixins
+        return page_next, weixins
 
     def get_search_url(self, keyword, page):
         return LIST_URL.format(keyword=keyword, page=page)

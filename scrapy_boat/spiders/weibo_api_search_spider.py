@@ -37,7 +37,7 @@ class WeiboApiSearchSpider(BaseSpider):
 
             keywords = line.strip().lstrip('(').rstrip(')').split(' | ')
             for keyword in keywords:
-                keyword = keyword.split(' ')[0]
+                keyword = ','.join(keyword.split(' '))
                 request = Request(BASE_URL.format(keywords=keyword, page=1), headers=None)
                 request.meta['page'] = 1
                 request.meta['keywords'] = keyword
