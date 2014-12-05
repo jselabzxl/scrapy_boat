@@ -14,11 +14,11 @@ HOST_URL = "http://news.baidu.com"
 LIST_URL = HOST_URL + "/ns?word={topic}&pn={offset}&cl=2&ct=1&tn=newsdy&rn={page_count}&ie=utf-8&bt={start_ts}&et={end_ts}"
 
 class BaiduNsSearchSpider(Spider):
-    """usage: scrapy crawl baidu_ns_search -a keywords_file='keywords_corp_baidu.txt' --loglevel=INFO
+    """usage: scrapy crawl baidu_ns_search -a keywords_file='keywords_corp_baidu.txt' -a start_datetime="2014-11-01 00:00:00" -a end_datetime="2014-12-01 00:00:00" --loglevel=INFO
     """
     name = "baidu_ns_search"
 
-    def __init__(self, keywords_file):
+    def __init__(self, keywords_file, start_datetime, end_datetime):
         self.keywords = []
         f = open('./source/' + keywords_file)
         for line in f:
@@ -34,8 +34,8 @@ class BaiduNsSearchSpider(Spider):
         f.close()
 
         self.page_count = 100
-        self.start_ts = self.datetime2ts('2014-11-01 00:00:00')
-        self.end_ts = self.datetime2ts('2014-12-01 00:00:00')
+        self.start_ts = self.datetime2ts(start_datetime)
+        self.end_ts = self.datetime2ts(end_datetime)
         self.source_website = self.name
         self.category = keywords_file
 
@@ -81,6 +81,9 @@ class BaiduNsSearchSpider(Spider):
     def datetime2ts(self, date):
         return int(time.mktime(time.strptime(date, '%Y-%m-%d %H:%M:%S')))
 
+    def ts2date(self, ts):
+        return time.strftime('%Y-%m-%d', time.localtime(ts))
+
     def resp2items(self, resp, base_item=None):
         soup = BeautifulSoup(resp)
 
@@ -106,6 +109,8 @@ class BaiduNsSearchSpider(Spider):
                 author_div = summary_div.find('p', {'class': 'c-author'})
                 author = str(author_div).split('&nbsp;&nbsp;')[0].strip('<p class="c-author">').decode('utf-8')
                 datetime = str(author_div).split('&nbsp;&nbsp;')[1].strip('</p>').replace('  ', ' ')
+                timestamp = self.datetime2ts(datetime)
+                date = self.ts2date(timestamp)
                 summary = re.search(r'</p>(.*?)<a', str(summary_div)).group(1).decode('utf-8').replace('<em>', '').replace('</em>', '')
 
                 more_same_link = None
@@ -115,7 +120,9 @@ class BaiduNsSearchSpider(Spider):
                 same_news_num = 0
                 relative_news = None
 
-                news_item = {'title': title, 'url': url, 'same_news_num': same_news_num, 'more_same_link': more_same_link, 'relative_news': relative_news, 'user_name': author, 'datetime': datetime, 'summary': summary, 'source_website': self.source_website, 'category': self.category}
+                news_item = {'title': title, 'url': url, 'same_news_num': same_news_num, 'more_same_link': more_same_link, \
+                        'relative_news': relative_news, 'user_name': author, 'timestamp': timestamp, 'datetime': datetime, \
+                        'date': date, 'summary': summary, 'source_website': self.source_website, 'category': self.category}
 
                 item = ScrapyBoatItem()
                 for key in ScrapyBoatItem.RESP_ITER_KEYS_BAIDU:

@@ -17,11 +17,7 @@ NEWSPIDER_MODULE = 'scrapy_boat.spiders'
 #USER_AGENT = 'scrapy_boat (+http://www.yourdomain.com)'
 
 ITEM_PIPELINES = [
-    #'scrapy_boat.pipelines.ScrapyBoatPipeline',
-    #'scrapy_boat.pipelines.WeixinCsvPipeline'
-    #'scrapy_boat.pipelines.ChuanrenCsvPipeline'
-    #'scrapy_boat.pipelines.WeixinSearchCsvPipeline'
-    'scrapy_boat.pipelines.MongodbPipeline'
+    #'scrapy_boat.pipelines.MongodbPipeline'
 ]
 
 BOAT_HOST = "219.224.135.46"

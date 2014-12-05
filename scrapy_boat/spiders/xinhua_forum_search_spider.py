@@ -20,7 +20,7 @@ class XinhuaBbsSearchSpider(Spider):
     name = "xinhua_bbs_search"
 
     def __init__(self, keywords_file, start_datetime, end_datetime):
-        self.keywords = [] 
+        self.keywords = []
         f = open('./source/' + keywords_file)
         for line in f:
             if '!' in line:
@@ -30,8 +30,8 @@ class XinhuaBbsSearchSpider(Spider):
                     strip_no_querys.append(q.split(' !')[0])
                 strip_no_querys = '(' + ' | '.join(strip_no_querys) + ')'
                 line = strip_no_querys
-            keywords_para = line.strip()
-            self.keywords.append(keywords_para)
+            keywords_para = line.strip().lstrip('(').rstrip(')').split(' | ')
+            self.keywords.extend(keywords_para)
         f.close()
 
         self.start_ts = self.datetime2ts(start_datetime)
@@ -114,6 +114,7 @@ class XinhuaBbsSearchSpider(Spider):
             td3 = table[0].find('td', {'width': '150'})
             datetime = td3.text
             timestamp = self.datetime2ts(datetime)
+            date = self.ts2date(timestamp)
 
             summary = table[2].find('td')
             summary = summary.text
@@ -121,7 +122,7 @@ class XinhuaBbsSearchSpider(Spider):
             source_website = self.source_website
             category = self.category
 
-            bbs_item = (post_id, title, url, summary, user_url, user_name, timestamp, datetime, source_website, category)
+            bbs_item = (post_id, title, url, summary, user_url, user_name, timestamp, date, datetime, source_website, category)
 
             item = ScrapyBoatItem()
             keys = ScrapyBoatItem.RESP_ITER_KEYS_XINHUA_BBS
@@ -137,3 +138,5 @@ class XinhuaBbsSearchSpider(Spider):
     def ts2datetimeshort(self, ts):
         return time.strftime('%Y-%m-%d %H:%M',time.localtime(ts))
 
+    def ts2date(self, ts):
+        return time.strftime('%Y-%m-%d',time.localtime(ts))

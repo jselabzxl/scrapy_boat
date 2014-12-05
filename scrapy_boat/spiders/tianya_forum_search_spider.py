@@ -13,11 +13,11 @@ from BeautifulSoup import BeautifulSoup
 SEARCH_URL = "http://search.tianya.cn/bbs?q={keyword}&s=4&f=0&pn={page}" # 4表示按照发帖时间排序, 0表示搜索全文, 最多搜825条
 
 class TianyaBbsSearchSpider(Spider):
-    """usage: scrapy crawl tianya_bbs_search -a keywords_file='keywords_corp_forum.txt' --loglevel=INFO
+    """usage: scrapy crawl tianya_bbs_search -a keywords_file='keywords_corp_forum.txt' -a start_datetime="2014-11-01 00:00:00" -a end_datetime="2014-12-01 00:00:00" --loglevel=INFO
     """
     name = "tianya_bbs_search"
 
-    def __init__(self, keywords_file):
+    def __init__(self, keywords_file, start_datetime, end_datetime):
         self.keywords = []
         f = open('./source/' + keywords_file)
         for line in f:
@@ -32,8 +32,8 @@ class TianyaBbsSearchSpider(Spider):
             self.keywords.extend(keywords_para)
         f.close()
 
-        self.start_ts = self.datetime2ts('2014-11-01 00:00:00')
-        self.end_ts = self.datetime2ts('2014-12-01 00:00:00')
+        self.start_ts = self.datetime2ts(start_datetime)
+        self.end_ts = self.datetime2ts(end_datetime)
         self.source_website = self.name
         self.category = keywords_file
 
@@ -108,13 +108,14 @@ class TianyaBbsSearchSpider(Spider):
                 datetime, replies = datetime_replies
                 datetime = datetime.text
                 timestamp = self.datetimeshort2ts(datetime)
+                date = self.ts2date(timestamp)
                 if timestamp < self.start_ts:
                     page_next = False
                 replies = replies.text
                 source_website = self.source_website
                 category = self.category
 
-                bbs_item = (post_id, title, url, summary, source_website_url, source_website_name, user_url, user_name, timestamp, datetime, replies, source_website, category)
+                bbs_item = (post_id, title, url, summary, source_website_url, source_website_name, user_url, user_name, timestamp, date, datetime, replies, source_website, category)
 
                 item = ScrapyBoatItem()
                 keys = ScrapyBoatItem.RESP_ITER_KEYS_TIANYA_BBS
@@ -124,6 +125,8 @@ class TianyaBbsSearchSpider(Spider):
 
         return page_next, results
 
+    def ts2date(self, ts):
+        return time.strftime('%Y-%m-%d', time.localtime(ts))
 
     def datetime2ts(self, date):
         return int(time.mktime(time.strptime(date, '%Y-%m-%d %H:%M:%S')))

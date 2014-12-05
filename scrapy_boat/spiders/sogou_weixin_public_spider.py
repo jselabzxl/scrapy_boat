@@ -74,16 +74,20 @@ class SogouWeixinPublicSpider(Spider):
             source_website = self.source_website
             category = None
 
-            item_tuple = [key, tplid, classid, docid, title, title1, date, imglink, headimage, sourcename, content168, isV, openid, content, showurl, url, pagesize, lastModified, source_website, category]
+            datetime = self.ts2datetime(lastModified.text)
+
+            item_tuple = [key, tplid, classid, docid, title, title1, date, datetime, imglink, headimage, sourcename, content168, isV, openid, content, showurl, url, pagesize, lastModified, source_website, category]
             weixin = ScrapyBoatItem()
             keys = ScrapyBoatItem.RESP_ITER_KEYS_WEIXIN_PUBLIC
             for key in keys:
                 item_value = item_tuple[keys.index(key)]
-                if item_value and key != "source_website":
+                if item_value and key != "source_website" and key != "datetime":
                     item_value = item_value.text
                 elif not item_value:
                     item_value = None
                 elif key == "source_website":
+                    item_value = item_value
+                elif key == "datetime":
                     item_value = item_value
                 weixin[key] = item_value
 
@@ -94,3 +98,5 @@ class SogouWeixinPublicSpider(Spider):
     def get_search_url(self, openid, page):
         return LIST_URL.format(openid=openid, page=page)
 
+    def ts2datetime(self, ts):
+        return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(ts))

@@ -13,15 +13,13 @@ from BeautifulSoup import BeautifulSoup
 HOST_URL = "http://weixin.sogou.com"
 LIST_URL = HOST_URL + "/weixin?query={keyword}&type=2&page={page}&ie=utf8&p=01030402&dp=1"
 
-def ts2date(ts):
-    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(ts))
 
 class SogouWeixinSearchSpider(Spider):
-    """usage: scrapy crawl sogou_weixin_search -a keywords_file='keywords_corp_weixin.txt' --loglevel=INFO
+    """usage: scrapy crawl sogou_weixin_search -a keywords_file='keywords_corp_weixin.txt' -a start_datetime='2014-11-01 00:00:00' -a end_datetime='2014-12-01 00:00:00' --loglevel=INFO
     """
     name = "sogou_weixin_search"
 
-    def __init__(self, keywords_file):
+    def __init__(self, keywords_file, start_datetime, end_datetime):
         self.keywords = []
         f = open('./source/' + keywords_file)
         for line in f:
@@ -37,8 +35,8 @@ class SogouWeixinSearchSpider(Spider):
         f.close()
 
         self.page_count = 100
-        self.start_ts = self.datetime2ts('2014-11-01 00:00:00')
-        self.end_ts = self.datetime2ts('2014-12-01 00:00:00')
+        self.start_ts = self.datetime2ts(start_datetime)
+        self.end_ts = self.datetime2ts(end_datetime)
         self.source_website = self.name
         self.category = keywords_file
 
@@ -75,6 +73,12 @@ class SogouWeixinSearchSpider(Spider):
     def datetime2ts(self, date):
         return int(time.mktime(time.strptime(date, '%Y-%m-%d %H:%M:%S')))
 
+    def ts2date(self, ts):
+        return time.strftime('%Y-%m-%d', time.localtime(ts))
+
+    def ts2datetime(self, ts):
+        return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(ts))
+
     def resp2items(self, resp):
         weixins = []
         resp = resp.replace("red_beg", "").replace("red_end", "").replace("&mdash;", "")
@@ -96,11 +100,14 @@ class SogouWeixinSearchSpider(Spider):
             post_source_url = HOST_URL + s_p_a.get("href")
             post_source_name = s_p_a.get("title")
             timestamp = int(s_p_div.get("t"))
-            date = ts2date(timestamp)
+            date = self.ts2date(timestamp)
+            datetime = self.ts2datetime(timestamp)
             source_website = self.source_website
             category = self.category
 
-            item_tuple = [post_id, post_img, post_title, post_url, post_summary, post_source_url, post_source_name, timestamp, date, source_website, category]
+            item_tuple = [post_id, post_img, post_title, post_url, \
+                    post_summary, post_source_url, post_source_name, \
+                    timestamp, date, datetime, source_website, category]
             weixin = ScrapyBoatItem()
             keys = ScrapyBoatItem.RESP_ITER_KEYS_WEIXIN_SEARCH
             for key in keys:
