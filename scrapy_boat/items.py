@@ -51,7 +51,7 @@ class ScrapyBoatItem(Item):
     source_from_name = Field() # 帖子来源版块名称
     replies = Field() # 回复数
 
-    RESP_ITER_KEYS_BAIDU = ['title', 'url', 'same_news_num', 'more_same_link', 'relative_news', 'user_name', 'timestamp', 'datetime', 'date', 'summary', 'source_website', 'category']
+    RESP_ITER_KEYS_BAIDU = ['id', 'title', 'url', 'same_news_num', 'more_same_link', 'relative_news', 'user_name', 'timestamp', 'datetime', 'date', 'summary', 'source_website', 'category']
     RESP_ITER_KEYS_WEIXIN_PUBLIC = ['key', 'tplid', 'classid', 'id', 'title', 'title1', 'date', 'datetime', 'thumbnail_url', 'user_image_url', 'user_name', 'content168', 'isV', 'user_id', 'summary', 'showurl', 'url', 'pagesize', 'timestamp', 'source_website', 'category']
     RESP_ITER_KEYS_WEIXIN_SEARCH = ['id', 'thumbnail_url', 'title', 'url', 'summary', 'user_url', 'user_name', 'timestamp', 'date', 'datetime', 'source_website', 'category']
     RESP_ITER_KEYS_TIANYA_BBS = ['id', 'title', 'url', 'summary', 'source_from_url', 'source_from_name', 'user_url', 'user_name', 'timestamp', 'date', 'datetime', 'replies', 'source_website', 'category']

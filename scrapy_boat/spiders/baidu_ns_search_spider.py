@@ -101,6 +101,7 @@ class BaiduNsSearchSpider(Spider):
             for li in result_lis:
                 title = li.find('h3', {'class': 'c-title'}).find('a').text
                 url = li.find('h3', {'class': 'c-title'}).find('a').get('href')
+                id = url
 
                 summary_div = li.find('div', {'class': 'c-summary c-row '})
                 if not summary_div:
@@ -120,7 +121,7 @@ class BaiduNsSearchSpider(Spider):
                 same_news_num = 0
                 relative_news = None
 
-                news_item = {'title': title, 'url': url, 'same_news_num': same_news_num, 'more_same_link': more_same_link, \
+                news_item = {'id': id, 'title': title, 'url': url, 'same_news_num': same_news_num, 'more_same_link': more_same_link, \
                         'relative_news': relative_news, 'user_name': author, 'timestamp': timestamp, 'datetime': datetime, \
                         'date': date, 'summary': summary, 'source_website': self.source_website, 'category': self.category}
 
