@@ -55,7 +55,8 @@ class ScrapyBoatItem(Item):
     RESP_ITER_KEYS_WEIXIN_PUBLIC = ['key', 'tplid', 'classid', 'id', 'title', 'title1', 'date', 'thumbnail_url', 'user_image_url', 'user_name', 'content168', 'isV', 'user_id', 'summary', 'showurl', 'url', 'pagesize', 'timestamp', 'source_website', 'category']
     RESP_ITER_KEYS_WEIXIN_SEARCH = ['id', 'thumbnail_url', 'title', 'url', 'summary', 'user_url', 'user_name', 'timestamp', 'date', 'source_website', 'category']
     RESP_ITER_KEYS_TIANYA_BBS = ['id', 'title', 'url', 'summary', 'source_from_url', 'source_from_name', 'user_url', 'user_name', 'timestamp', 'datetime', 'replies', 'source_website', 'category']
-
+    RESP_ITER_KEYS_XINHUA_BBS = ['id', 'title', 'url', 'summary', 'user_url', 'user_name', 'timestamp', 'datetime','source_website', 'category']
+    
     def __init__(self):
         super(ScrapyBoatItem, self).__init__()
         default_none_keys = []
@@ -63,6 +64,7 @@ class ScrapyBoatItem(Item):
         default_none_keys.extend(self.RESP_ITER_KEYS_WEIXIN_PUBLIC)
         default_none_keys.extend(self.RESP_ITER_KEYS_WEIXIN_SEARCH)
         default_none_keys.extend(self.RESP_ITER_KEYS_TIANYA_BBS)
+        default_none_keys.extend(self.RESP_ITER_KEYS_XINHUA_BBS)
 
         for key in default_none_keys:
             self.setdefault(key, None)
