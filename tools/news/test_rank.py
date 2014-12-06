@@ -77,8 +77,8 @@ def word_net(data):
     weibo_text = dict()
     weibo_mid = []
     for i in range(0,len(data)):
-        text = data[i][5] + '_' + data[i][8]
-        mid = data[i][0]
+        text = data[i]['text4wordnet']
+        mid = data[i]['id']
         words = sw.participle(text)
         row = []
         for word in words:
@@ -159,35 +159,43 @@ def word_net(data):
     data = weight.TopK()
     return data
 
-def get_text_net(flag,weibo_text,word):
-
+def get_text_net(flag, weibo_text, word):
     c = dict()
     news_data = dict()
-    for i in range(0,len(weibo_text)):
-
-        k = weibo_text[i][0]
+    for wt in weibo_text:
+        
+        k = wt['id']
         c[str(k)] = 0
         w_list = []
         for w in word:
             k1,k2 = w[1].split('_')
-            c[str(k)] = c[str(k)] + str(weibo_text[i][5]).count(str(k1))*w[0] + str(weibo_text[i][5]).count(str(k2))*w[0] + str(weibo_text[i][8]).count(str(k1))*w[0] + str(weibo_text[i][8]).count(str(k2))*w[0]
+            if 'title' in wt:
+                title_cal = wt['title'].encode('utf-8')
+                summary_cal = wt['summary'].encode('utf-8')
+                c[str(k)] = c[str(k)] + title_cal.count(str(k1))*w[0] + summary_cal.count(str(k2))*w[0] + summary_cal.count(str(k1))*w[0] + summary_cal.count(str(k2))*w[0]
+            else:
+                c[str(k)] = c[str(k)] + wt['text'].encode('utf-8').count(str(k1))*w[0] + wt['text'].encode('utf-8').count(str(k2))*w[0]
             if w not in w_list:
                 w_list.append(str(w))
         c[str(k)] = c[str(k)] * float(len(w_list))/float(len(word))
-        news_data[str(k)] = weibo_text[i]
+        news_data[str(k)] = wt
 
     n = len(weibo_text)
     f_weibo = TopkHeap(n)
     for k,v in c.iteritems():
-        f_weibo.Push((v,k))#排序
+        f_weibo.Push((v, news_data[str(k)]))#排序
 
     data = f_weibo.TopK()
 
+    return data
+    
+    """
     with open('./text%s.csv' % flag, 'wb') as f:
         writer = csv.writer(f) 
         for i in range(0,len(data)):
             k = data[i][1]
             writer.writerow((news_data[k][0],news_data[k][1],news_data[k][2],news_data[k][3],news_data[k][4],news_data[k][5],news_data[k][6],news_data[k][7],news_data[k][8],news_data[k][9]))
+    """
 
 def write(flag,data):
 

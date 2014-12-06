@@ -50,7 +50,7 @@ def load_scws():
     return s
 
 def train():#生成训练集数据
-    reader = csv.reader(file('./test/train.csv', 'rb'))
+    reader = csv.reader(file(os.path.join(os.path.dirname(os.path.abspath(__file__)), './test/train.csv'), 'rb'))
     feature = []
     lable = []
     text_data = []
@@ -74,21 +74,21 @@ def train():#生成训练集数据
                 row = row + ' ' + str(j+1) + ':' + str(text_data[i].count(feature[j]))        
         item.append(row)
     
-    with open('./svm/train.txt', 'wb') as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), './svm/train.txt'), 'wb') as f:
         writer = csv.writer(f)
         for i in range(0,len(item)):
             row = []
             row.append(item[i])
             writer.writerow((row))
 
-    with open('./svm/feature.csv', 'wb') as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), './svm/feature.csv'), 'wb') as f:
         writer = csv.writer(f)
         for i in range(0,len(feature)):
             writer.writerow((i+1,feature[i]))                    
 
 def test(weibo,flag):
     word_dict = dict()
-    reader = csv.reader(file('./svm/feature.csv', 'rb'))
+    reader = csv.reader(file(os.path.join(os.path.dirname(os.path.abspath(__file__)), './svm/feature.csv'), 'rb'))
     for w,c in reader:
         word_dict[str(c)] = w 
 
@@ -117,7 +117,7 @@ def test(weibo,flag):
                 f_row = f_row + ' ' + str(item) 
         f_items.append(f_row)
 
-    with open('./svm_test/test%s.txt' % flag, 'wb') as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), './svm_test/test%s.txt' % flag), 'wb') as f:
         writer = csv.writer(f)
         for i in range(0,len(f_items)):
             row = []
@@ -127,14 +127,14 @@ def test(weibo,flag):
     return items
 
 def cross_text():
-    y, x = svm_read_problem('./svm/train.txt')
+    y, x = svm_read_problem(os.path.join(os.path.dirname(os.path.abspath(__file__)), './svm/train.txt'))
     m = svm_train(y, x, '-c 4  -v 10  -t 0')
 
 def choose_ad(flag):
-    y, x = svm_read_problem('./svm/train.txt')
+    y, x = svm_read_problem(os.path.join(os.path.dirname(os.path.abspath(__file__)), './svm/train.txt'))
     m = svm_train(y, x, '-c 4 -t 0')
 
-    y, x = svm_read_problem('./svm_test/test%s.txt' % flag)
+    y, x = svm_read_problem(os.path.join(os.path.dirname(os.path.abspath(__file__)), './svm_test/test%s.txt' % flag))
     p_label, p_acc, p_val  = svm_predict(y, x, m)
 
     return p_label
@@ -142,7 +142,7 @@ def choose_ad(flag):
 def start(flag):
 
     weibo_mid = []
-    reader = csv.reader(file('./test/test%s.csv' % flag, 'rb'))
+    reader = csv.reader(file(os.path.join(os.path.dirname(os.path.abspath(__file__)), './test/test%s.csv' % flag), 'rb'))
     for t,c in reader:
         weibo_mid.append([t,c]) 
     

@@ -101,7 +101,7 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
             else:
                 r['keywords_hit'] = False
 
-            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
+            mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
 
     print source_en, keywords_file, count, hit_count
 

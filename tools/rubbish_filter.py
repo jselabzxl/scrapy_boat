@@ -5,8 +5,16 @@
 from utils import _default_mongo, get_module_keywords, START_TS, END_TS
 
 
-def rel_filter(text):
-    
+def rel_classifier(inputs):
+    import sys
+    sys.path.append('./libsvm-3.17/python/')
+    from final import test, choose_ad
+
+    flag = '1'
+    test(inputs, flag)
+    label = choose_ad(flag)
+
+    return label
 
 def _encode_utf8(us):
     if isinstance(us, unicode):
@@ -35,37 +43,60 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
         query_dict["source_website"] = source_en
         count = mongo.master_timeline_weibo.find(query_dict).count()
         results = mongo.master_timeline_weibo.find(query_dict)
-        rel_count = 0
+
+        rs = []
+        inputs = []
         for r in results:
             text = _encode_utf8(r['text'])
-            rel = rel_classifier(text)
-            if rel:
-                rel_count += 1
-            else:
-                pass
+            inputs.append([r['_id'], text])
+            rs.append(r)
 
-            #mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
+        if len(inputs):
+            rel = rel_classifier(inputs)
+        else:
+            rel = []            
+        rel = [int(l) for l in rel]
+
+        rel_count = 0
+        for idx, r in enumerate(rs):
+            if rel[idx] == 1:
+                rel_count += 1
+                r['rubbish'] = False
+            else:
+                r['rubbish'] = True
+            
+            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
     else:
         query_dict["category"] = keywords_file
         query_dict["source_website"] = source_en
         count = mongo.boatcol.find(query_dict).count()
         results = mongo.boatcol.find(query_dict)
 
-        rel_count = 0
+        rs = []
+        inputs = []
         for r in results:
             title = _encode_utf8(r['title'])
             content168 = _encode_utf8(r['content168'])
             summary = _encode_utf8(r['summary'])
 
             text = title  + content168 + summary
-            rel = rel_classifier(text)
-            if hit:
-                #r['keywords_hit'] = True
-                rel_count += 1
-            else:
-                pass
-                #r['keywords_hit'] = False
+            inputs.append([r['_id'], text])
+            rs.append(r)
 
-            #mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
+        if len(inputs):
+            rel = rel_classifier(inputs)
+        else:
+            rel = []
+        rel = [int(l) for l in rel]
+
+        rel_count = 0
+        for idx, r in enumerate(rs):
+            if rel[idx] == 1:
+                rel_count += 1
+                r['rubbish'] = False
+            else:
+                r['rubbish'] = True
+            
+            mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
 
     print source_en, keywords_file, count, rel_count
