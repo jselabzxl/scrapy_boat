@@ -28,7 +28,6 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
         },
         "keywords_hit": True,
         "rubbish": False,
-        "same_rubbish": False
     }
 
     if source_en == "weibo_api_search_spider":
