@@ -2,7 +2,11 @@
 
 import csv
 import time
+import collections
+from xapian_case.utils import load_scws, cut
 from utils import START_DATETIME, END_DATETIME, _default_mongo, get_module_keywords, START_TS, END_TS
+
+s = load_scws()
 
 mongo = _default_mongo()
 
@@ -64,6 +68,12 @@ def sheqi_author_stat():
         "新闻": {}
     }
 
+    # 微博论坛渠道的情绪统计
+    sentiment_dict = dict()
+
+    # 统计关键词
+    total_keywords_list = []
+
     query_dict["$or"] = [{"source_category": "keywords_corp_weiboapi.txt"}, {"source_category": "keywords_hot_weiboapi.txt"}, {"source_category": "keywords_leader_weiboapi.txt"}]
     query_dict["source_website"] = "weibo_api_search_spider"
     count = mongo.master_timeline_weibo.find(query_dict).count()
@@ -75,6 +85,11 @@ def sheqi_author_stat():
             source_daily_dict["微博"][ts2date(r["timestamp"])] += 1
         except KeyError:
             source_daily_dict["微博"][ts2date(r["timestamp"])] = 1
+
+        try:
+            sentiment_dict[r["sentiment"]] += 1
+        except KeyError:
+            sentiment_dict[r["sentiment"]] = 1
 
     query_dict["$or"] = [{"category": "keywords_corp_forum.txt"}, {"category": "keywords_hot_forum.txt"}, {"category": "keywords_leader_forum.txt"}]
     del query_dict["source_website"]
@@ -92,6 +107,11 @@ def sheqi_author_stat():
             source_daily_dict["论坛"][r["date"]] += 1
         except KeyError:
             source_daily_dict["论坛"][r["date"]] = 1
+
+        try:
+            sentiment_dict[r["sentiment"]] += 1
+        except KeyError:
+            sentiment_dict[r["sentiment"]] = 1
 
     query_dict["$or"] = [{"category": "keywords_corp_weixin.txt"}, {"category": "keywords_hot_weixin.txt"}, {"category": "keywords_leader_weixin.txt"}]
     count = mongo.boatcol.find(query_dict).count()
@@ -136,6 +156,8 @@ def sheqi_author_stat():
         fw.writerow((_encode_utf8(k), v))
 
     for text in texts:
+        cut_kw = cut(s, text)
+        total_keywords_list.extend(cut_kw)
         for keyword in keywords:
             if keyword in text:
                 try:
@@ -154,6 +176,16 @@ def sheqi_author_stat():
     for source, daily_dict in source_daily_dict.iteritems():
         for date, count in daily_dict.iteritems():
             fw.writerow((_encode_utf8(source), date, count))
+
+    fw = csv.writer(open('sheqi_sentiment_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    for sentiment, count in sentiment_dict.iteritems():
+        fw.writerow((sentiment, count))
+
+    ct = collections.Counter(total_keywords_list)
+    keywords_results = ct.most_common(50)
+    fw = csv.writer(open('sheqi_keywords_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    for keyword, count in keywords_results.iteritems():
+        fw.writerow((_encode_utf8(keyword), count))
 
 
 if __name__=="__main__":
