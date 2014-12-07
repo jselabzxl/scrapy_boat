@@ -28,6 +28,18 @@ def keywords_hit(text, hit_keywords):
             hit= True
             break
 
+    rubbish_words = ['个股', '趋势', '股票', '涨停']
+    for rub in rubbish_words:
+        if rub in text:
+            hit = False
+            break
+
+    if '【' in text and '】' in text and '验证' not in text:
+        hit = True
+
+    if '中国船舶大学' in text:
+        hit = False
+
     return hit
 
 def _encode_utf8(us):

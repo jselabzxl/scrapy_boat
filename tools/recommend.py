@@ -153,7 +153,26 @@ def domain_rec(sort_field='hot'):
         fw.writerow(csvrow)
 
 
+def get_keywords(keywords_file):
+    keywords = []
+    keywords_file = '../source/' + keywords_file
+    f = open(keywords_file)
+    for line in f:
+        if '!' in line:
+            strip_no_querys = []
+            querys = line.strip().lstrip('(').rstrip(')').split(' | ')
+            for q in querys:
+                strip_no_querys.append(q.split(' !')[0])
+            strip_no_querys = '+'.join(strip_no_querys)
+            line = strip_no_querys
+        keywords_para = line.strip().lstrip('(').rstrip(')').split(' | ')
+        keywords.extend(keywords_para)
+    f.close()
+
+    return keywords
+
 def enemy_rec(sort_field='hot'):
+    keywords = get_keywords('keywords_enemy_baidu.txt')
     query_dict = {
         "timestamp": {
             "$gte": START_TS,
@@ -180,6 +199,8 @@ def enemy_rec(sort_field='hot'):
 
     fw = csv.writer(open('enemy_weibo_sort_%s_%s_%s.csv' % (sort_field, START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     fw.writerow(WEIBO_KEYS)
+    # 按对手组织文本
+    corp_weibo_dict = dict()
     for r in results:
         csvrow = []
         for key in WEIBO_KEYS:
@@ -194,6 +215,16 @@ def enemy_rec(sort_field='hot'):
 
         fw.writerow(csvrow)
 
+        if sort_field == 'hot':
+            text = r['text'].encode('utf-8')
+            for keyword in keywords:
+                if keyword in text:
+                    try:
+                        corp_weibo_dict[keyword].append(r)
+                    except KeyError:
+                        corp_weibo_dict[keyword] = [r]
+
+
     query_dict["$or"] = or_query_news_dict
     del query_dict["same_rubbish_" + sort_field]
     query_dict["same_rubbish" + sort_field] = False
@@ -203,6 +234,8 @@ def enemy_rec(sort_field='hot'):
 
     fw = csv.writer(open('enemy_news_sort_%s_%s_%s.csv' % (sort_field, START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     fw.writerow(NEWS_KEYS)
+    # 按对手组织文本
+    corp_news_dict = dict()
     for r in results:
         csvrow = []
         for key in NEWS_KEYS:
@@ -216,6 +249,56 @@ def enemy_rec(sort_field='hot'):
             csvrow.append(_encode_utf8(r[key]))
 
         fw.writerow(csvrow)
+
+        if sort_field == 'hot':
+            text = r['text'].encode('utf-8')
+            for keyword in keywords:
+                if keyword in text:
+                    try:
+                        corp_news_dict[keyword].append(r)
+                    except KeyError:
+                        corp_news_dict[keyword] = [r]
+
+    if corp_news_dict != {}:
+        fw = csv.writer(open('enemy_news_gongsi_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+        new_keys = ['gongsi']
+        new_keys += NEWS_KEYS
+        fw.writerow(new_keys)
+        for corp, news_dict in corp_news_dict.iteritems():
+            for r in news_dict:
+                csvrow = [corp]
+                for key in NEWS_KEYS:
+                    if key == 'rel_score' and key not in r:
+                        r[key] = 0
+                    if key == 'hot' and key not in r:
+                        r[key] = 0
+                    if key == 'sensi' and key not in r:
+                        r[key] = 0
+
+                    csvrow.append(_encode_utf8(r[key]))
+
+                fw.writerow((csvrow))
+
+    if corp_weibo_dict != {}:
+        fw = csv.writer(open('enemy_weibo_gongsi_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+        new_keys = ['gongsi']
+        new_keys += WEIBO_KEYS
+        fw.writerow(new_keys)
+        for corp, weibo_dict in corp_weibo_dict.iteritems():
+            for r in weibo_dict:
+                csvrow = [corp]
+                for key in WEIBO_KEYS:
+                    if key == 'rel_score' and key not in r:
+                        r[key] = 0
+                    if key == 'hot' and key not in r:
+                        r[key] = 0
+                    if key == 'sensi' and key not in r:
+                        r[key] = 0
+
+                    csvrow.append(_encode_utf8(r[key]))
+
+                fw.writerow((csvrow))
+
 
 if __name__ == "__main__":
     sheqi_rec(sort_field='hot')
