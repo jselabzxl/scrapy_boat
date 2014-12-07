@@ -184,7 +184,7 @@ def sheqi_author_stat():
     ct = collections.Counter(total_keywords_list)
     keywords_results = ct.most_common(50)
     fw = csv.writer(open('sheqi_keywords_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
-    for keyword, count in keywords_results.iteritems():
+    for keyword, count in keywords_results:
         fw.writerow((_encode_utf8(keyword), count))
 
 
