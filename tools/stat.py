@@ -202,7 +202,11 @@ def enemy_stat():
     count = mongo.master_timeline_weibo.find(query_dict).count()
     results = mongo.master_timeline_weibo.find(query_dict)
     for r in results:
-        texts.append([r['text'].encode('utf-8'), r['hot']])
+        if 'hot' in r:
+            hot = r['hot']
+        else:
+            hot = 1
+        texts.append([r['text'].encode('utf-8'), hot])
 
     query_dict["$or"] = [{"category": "keywords_enemy_forum.txt"}]
     del query_dict["source_website"]
@@ -214,7 +218,11 @@ def enemy_stat():
         summary = _encode_utf8(r['summary'])
 
         text = title  + content168 + summary
-        texts.append([text, r['hot']])
+        if 'hot' in r:
+            hot = r['hot']
+        else:
+            hot = 1
+        texts.append([text, hot])
 
     query_dict["$or"] = [{"category": "keywords_enemy_weixin.txt"}]
     count = mongo.boatcol.find(query_dict).count()
@@ -225,7 +233,11 @@ def enemy_stat():
         summary = _encode_utf8(r['summary'])
 
         text = title  + content168 + summary
-        texts.append([text, r['hot']])
+        if 'hot' in r:
+            hot = r['hot']
+        else:
+            hot = 1
+        texts.append([text, hot])
 
     query_dict["$or"] = [{"category": "keywords_enemy_baidu.txt"}]
     query_dict["source_website"] = "baidu_ns_search"
@@ -236,7 +248,11 @@ def enemy_stat():
         summary = _encode_utf8(r['summary'])
 
         text = title  + content168 + summary
-        texts.append([text, r['hot']])
+        if 'hot' in r:
+            hot = r['hot']
+        else:
+            hot = 1
+        texts.append([text, hot])
 
     for text in texts:
         cut_kw = cut(s, text[0])
