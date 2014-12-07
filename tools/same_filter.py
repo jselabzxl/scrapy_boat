@@ -25,6 +25,8 @@ def _encode_utf8(us):
 
     return us
 
+print "same_filter begins..."
+
 mongo = _default_mongo()
 
 module_keywords = get_module_keywords()
@@ -85,3 +87,5 @@ for sort_field in ['rel_score', 'hot', 'sensi']:
                 mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
 
         print source_en, keywords_file, count, len(no_sames)
+
+print "same_filter ends..."

@@ -64,6 +64,8 @@ def get_keywords(file_name):
 
     return hit_keywords
 
+print "post filter begins..."
+
 mongo = _default_mongo()
 
 module_keywords = get_module_keywords()
@@ -117,3 +119,4 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
 
     print source_en, keywords_file, count, hit_count
 
+print "post filter ends..."

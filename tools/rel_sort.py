@@ -16,6 +16,8 @@ def _encode_utf8(us):
 
     return us
 
+print "rel_sort begins..."
+
 mongo = _default_mongo()
 
 module_keywords = get_module_keywords()
@@ -74,3 +76,5 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
             mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
 
     print source_en, keywords_file, count
+
+print "rel_sort ends..."

@@ -4,6 +4,8 @@
 
 from utils import _default_mongo, get_module_keywords, START_TS, END_TS
 
+print "sensitive_sort begins..."
+
 sensi_words = []
 def cal_sensi(text):
     w = 0
@@ -61,3 +63,4 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
 
     print source_en, keywords_file, count
 
+print "sensitive_sort ends..."

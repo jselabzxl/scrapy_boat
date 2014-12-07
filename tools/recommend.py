@@ -7,7 +7,6 @@ from utils import START_DATETIME, END_DATETIME, _default_mongo, get_module_keywo
 
 mongo = _default_mongo()
 
-
 def _encode_utf8(us):
     if isinstance(us, unicode):
         us = us.encode('utf-8')
@@ -301,6 +300,7 @@ def enemy_rec(sort_field='hot'):
 
 
 if __name__ == "__main__":
+    print "recommend begins..."
     sheqi_rec(sort_field='hot')
     sheqi_rec(sort_field='rel_score')
     sheqi_rec(sort_field='sensi')
@@ -310,3 +310,4 @@ if __name__ == "__main__":
     enemy_rec(sort_field='hot')
     enemy_rec(sort_field='rel_score')
     enemy_rec(sort_field='sensi')
+    print "recommend ends..."
