@@ -2,6 +2,7 @@
 """信息去重
 """
 
+import pymongo
 import Levenshtein
 from utils import _default_mongo, get_module_keywords, START_TS, END_TS
 
@@ -28,58 +29,59 @@ mongo = _default_mongo()
 
 module_keywords = get_module_keywords()
 
-for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
-    query_dict = {
-        "timestamp": {
-            "$gte": START_TS,
-            "$lt": END_TS
-        },
-        "keywords_hit": True,
-        "rubbish": False
-    }
+for sort_field in ['rel_score', 'hot', 'sensi']:
+    for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
+        query_dict = {
+            "timestamp": {
+                "$gte": START_TS,
+                "$lt": END_TS
+            },
+            "keywords_hit": True,
+            "rubbish": False
+        }
 
-    if source_en == "weibo_api_search_spider":
-        query_dict["source_category"] = keywords_file
-        query_dict["source_website"] = source_en
-        count = mongo.master_timeline_weibo.find(query_dict).count()
-        results = mongo.master_timeline_weibo.find(query_dict)
+        if source_en == "weibo_api_search_spider":
+            query_dict["source_category"] = keywords_file
+            query_dict["source_website"] = source_en
+            count = mongo.master_timeline_weibo.find(query_dict).count()
+            results = mongo.master_timeline_weibo.find(query_dict).sort(sort_field, pymongo.DESCENDING)
 
-        no_sames = []
-        for r in results:
-            text = _encode_utf8(r['text'])
-            r['text4same_filter'] = text
-            
-            ratio = max_same_rate(no_sames, r)
-            if ratio < SAME_RATIO_THESHOLD:
-            	no_sames.append(r)
-            	r['same_rubbish'] = False
-            else:
-            	r['same_rubbish'] = True
-            
-            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
+            no_sames = []
+            for r in results:
+                text = _encode_utf8(r['text'])
+                r['text4same_filter'] = text
+                
+                ratio = max_same_rate(no_sames, r)
+                if ratio < SAME_RATIO_THESHOLD:
+                    no_sames.append(r)
+                    r['same_rubbish_' + sort_field] = False
+                else:
+                    r['same_rubbish_' + sort_field] = True
+                
+                mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
 
-    else:
-        query_dict["category"] = keywords_file
-        query_dict["source_website"] = source_en
-        count = mongo.boatcol.find(query_dict).count()
-        results = mongo.boatcol.find(query_dict)
+        else:
+            query_dict["category"] = keywords_file
+            query_dict["source_website"] = source_en
+            count = mongo.boatcol.find(query_dict).count()
+            results = mongo.boatcol.find(query_dict).sort(sort_field, pymongo.DESCENDING)
 
-        no_sames = []
-        for r in results:
-            title = _encode_utf8(r['title'])
-            content168 = _encode_utf8(r['content168'])
-            summary = _encode_utf8(r['summary'])
+            no_sames = []
+            for r in results:
+                title = _encode_utf8(r['title'])
+                content168 = _encode_utf8(r['content168'])
+                summary = _encode_utf8(r['summary'])
 
-            text = title  + content168 + summary
-            r['text4same_filter'] = text
-            
-            ratio = max_same_rate(no_sames, r)
-            if ratio < SAME_RATIO_THESHOLD:
-            	no_sames.append(r)
-            	r['same_rubbish'] = False
-            else:
-            	r['same_rubbish'] = True
-            
-            mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
+                text = title  + content168 + summary
+                r['text4same_filter'] = text
+                
+                ratio = max_same_rate(no_sames, r)
+                if ratio < SAME_RATIO_THESHOLD:
+                    no_sames.append(r)
+                    r['same_rubbish' + sort_field] = False
+                else:
+                    r['same_rubbish' + sort_field] = True
+                
+                mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
 
-    print source_en, keywords_file, count, len(no_sames)
+        print source_en, keywords_file, count, len(no_sames)
