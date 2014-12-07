@@ -8,6 +8,15 @@ from utils import _default_mongo, get_module_keywords, START_TS, END_TS
 
 s = load_scws()
 
+def _encode_utf8(us):
+    if isinstance(us, unicode):
+        us = us.encode('utf-8')
+
+    if not us:
+        us = ''
+
+    return us
+
 def diamond_classifier(item):
     # 其他类
     sentiment = 0
