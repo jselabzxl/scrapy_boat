@@ -435,8 +435,8 @@ def domain_stat():
         fw.writerow((_encode_utf8(keyword), count))
 
 if __name__=="__main__":
-    #sheqi_stat()
-    #enemy_stat()
-    #friends_stat()
+    sheqi_stat()
+    enemy_stat()
+    friends_stat()
     domain_stat()
 
