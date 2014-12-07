@@ -425,7 +425,7 @@ def domain_stat():
         texts.append(text)
 
     for text in texts:
-        cut_kw = cut(s, text[0])
+        cut_kw = cut(s, text)
         total_keywords_list.extend(cut_kw)
 
     ct = collections.Counter(total_keywords_list)
