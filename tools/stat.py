@@ -214,7 +214,7 @@ def enemy_stat():
         summary = _encode_utf8(r['summary'])
 
         text = title  + content168 + summary
-        texts.append([text, r['hot']))
+        texts.append([text, r['hot']])
 
     query_dict["$or"] = [{"category": "keywords_enemy_weixin.txt"}]
     count = mongo.boatcol.find(query_dict).count()
