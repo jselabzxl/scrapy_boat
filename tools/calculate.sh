@@ -1,5 +1,4 @@
-python post_filter.py
-python rubbish_filter.py
+python sentiment_cal.py
 python stat.py
 python hot_sort.py
 python rel_sort.py

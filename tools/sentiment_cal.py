@@ -6,6 +6,7 @@ from xapian_case.utils import load_scws, cut
 from triple_sentiment_classifier import triple_classifier
 from utils import _default_mongo, get_module_keywords, START_TS, END_TS
 
+print 'sentiment begins...'
 s = load_scws()
 
 def _encode_utf8(us):
@@ -72,3 +73,5 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
             mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
 
     print source_en, keywords_file, count
+
+print 'sentiment ends...'
