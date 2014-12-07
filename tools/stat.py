@@ -424,6 +424,10 @@ def domain_stat():
         text = title  + content168 + summary
         texts.append(text)
 
+    for text in texts:
+        cut_kw = cut(s, text[0])
+        total_keywords_list.extend(cut_kw)
+
     ct = collections.Counter(total_keywords_list)
     keywords_results = ct.most_common(50)
     fw = csv.writer(open('domain_keywords_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
