@@ -259,10 +259,14 @@ def enemy_stat():
         total_keywords_list.extend(cut_kw)
         for keyword in keywords:
             if keyword in text[0]:
+                if text[1] = 0:
+                    hot = 1
+                else:
+                    hot = text[1]
                 try:
-                    corp_dict[keyword] += text[1]
+                    corp_dict[keyword] += hot
                 except KeyError:
-                    corp_dict[keyword] = text[1]
+                    corp_dict[keyword] = hot
 
     fw = csv.writer(open('enemy_gongsi_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     results = sorted(corp_dict.iteritems(), key=lambda(k, v): v, reverse=True)
