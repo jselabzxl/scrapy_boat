@@ -66,7 +66,7 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
             summary = _encode_utf8(r['summary'])
 
             text = title  + content168 + summary
-            item['text'] = text
+            r['text'] = text
             sentiment = diamond_classifier(r)
             r['sentiment'] = sentiment
             mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
