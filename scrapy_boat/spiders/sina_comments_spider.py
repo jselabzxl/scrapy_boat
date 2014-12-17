@@ -28,5 +28,12 @@ class SinaCommentsSpider(Spider):
 
     def parse(self, response):
         resp = response.body
-        log.msg(str(resp))
+        soup = BeautifulSoup(resp)
+
+        comments = soup.findAll("div", {"class": "comment_item"})
+        log.msg(str(comments[0]))
+        """
+        for comment in comments:
+            log.msg(str(comment))
+        """
 

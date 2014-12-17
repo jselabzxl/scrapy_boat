@@ -4,7 +4,6 @@
 #    Time: 13:49
 #
 
-from logger import Logger
 import time
 
 from PyQt4.QtCore import QUrl, Qt
@@ -29,7 +28,6 @@ class CWebBrowser():
     def __init__(self):
 
         self.application = app
-        self.logger = Logger.getLogger()
 
         wp = QWebPage()
         wp.setForwardUnsupportedContent(True)
@@ -52,11 +50,11 @@ class CWebBrowser():
     def _on_load_started(self):
         self._load_success = False
         self._load_last = 0
-        self.logger.debug("Page Load Started")
+        #self.logger.debug("Page Load Started")
 
     def _on_load_finished(self):
         self._load_success = True
-        self.logger.debug("Page Load Finished " + unicode((self.webframe.url().toString())))
+        #self.logger.debug("Page Load Finished " + unicode((self.webframe.url().toString())))
 
     def make_request(self, url):
         url = QUrl(url)

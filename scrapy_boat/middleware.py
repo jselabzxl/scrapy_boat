@@ -8,6 +8,7 @@ class WebkitDownloader(object):
         timeout = 10
         delay = 3
         headers = {}
+        url = request.url
         if 'webkit' in request.meta and request.meta['webkit'] == True:
             browser = cwebbrowser.CWebBrowser()
             browser.setHeaders(headers)
