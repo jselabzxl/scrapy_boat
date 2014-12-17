@@ -20,6 +20,16 @@ ITEM_PIPELINES = [
     'scrapy_boat.pipelines.MongodbPipeline'
 ]
 
+"""
+DOWNLOAD_HANDLERS = {
+    'http': 'scrapy_boat.dhandler.WebkitDownloadHandler',
+    'https': 'scrapy_boat.dhandler.WebkitDownloadHandler'
+}
+"""
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy_boat.middleware.WebkitDownloader': 1
+}
+
 BOAT_HOST = "219.224.135.46"
 BOAT_PORT = 27019
 BOAT_DB = "boat"
