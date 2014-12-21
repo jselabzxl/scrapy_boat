@@ -17,15 +17,9 @@ NEWSPIDER_MODULE = 'scrapy_boat.spiders'
 #USER_AGENT = 'scrapy_boat (+http://www.yourdomain.com)'
 
 ITEM_PIPELINES = [
-    'scrapy_boat.pipelines.MongodbPipeline'
+    #'scrapy_boat.pipelines.MongodbPipeline'
 ]
 
-"""
-DOWNLOAD_HANDLERS = {
-    'http': 'scrapy_boat.dhandler.WebkitDownloadHandler',
-    'https': 'scrapy_boat.dhandler.WebkitDownloadHandler'
-}
-"""
 DOWNLOADER_MIDDLEWARES = {
     'scrapy_boat.middleware.WebkitDownloader': 1
 }
