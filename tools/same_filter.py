@@ -14,7 +14,7 @@ def max_same_rate(items, item):
     if len(ratio_list):
         return max(ratio_list)
     else:
-    	return 0
+        return 0
 
 def _encode_utf8(us):
     if isinstance(us, unicode):
@@ -45,8 +45,8 @@ for sort_field in ['rel_score', 'hot', 'sensi']:
         if source_en == "weibo_api_search_spider":
             query_dict["source_category"] = keywords_file
             query_dict["source_website"] = source_en
-            count = mongo.master_timeline_weibo.find(query_dict).count()
-            results = mongo.master_timeline_weibo.find(query_dict).sort(sort_field, pymongo.DESCENDING)
+            count = mongo.master_timeline_weibo.find(query_dict, timeout=False).count()
+            results = mongo.master_timeline_weibo.find(query_dict, timeout=False).sort(sort_field, pymongo.DESCENDING)
 
             no_sames = []
             for r in results:
@@ -56,17 +56,17 @@ for sort_field in ['rel_score', 'hot', 'sensi']:
                 ratio = max_same_rate(no_sames, r)
                 if ratio < SAME_RATIO_THESHOLD:
                     no_sames.append(r)
-                    r['same_rubbish_' + sort_field] = False
+                    same_rubbish = False
                 else:
-                    r['same_rubbish_' + sort_field] = True
+                    same_rubbish = True
                 
-                mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
+                mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": {"same_rubbish_" + sort_field: same_rubbish}})
 
         else:
             query_dict["category"] = keywords_file
             query_dict["source_website"] = source_en
-            count = mongo.boatcol.find(query_dict).count()
-            results = mongo.boatcol.find(query_dict).sort(sort_field, pymongo.DESCENDING)
+            count = mongo.boatcol.find(query_dict, timeout=False).count()
+            results = mongo.boatcol.find(query_dict, timeout=False).sort(sort_field, pymongo.DESCENDING)
 
             no_sames = []
             for r in results:
@@ -80,11 +80,11 @@ for sort_field in ['rel_score', 'hot', 'sensi']:
                 ratio = max_same_rate(no_sames, r)
                 if ratio < SAME_RATIO_THESHOLD:
                     no_sames.append(r)
-                    r['same_rubbish' + sort_field] = False
+                    same_rubbish = False
                 else:
-                    r['same_rubbish' + sort_field] = True
+                    same_rubbish = True
                 
-                mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
+                mongo.boatcol.update({"_id": r["_id"]}, {"$set": {"same_rubbish_" + sort_field: same_rubbish}})
 
         print source_en, keywords_file, count, len(no_sames)
 

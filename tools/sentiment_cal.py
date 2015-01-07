@@ -53,8 +53,7 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
 
         for r in results:
             sentiment = diamond_classifier(r)
-            r['sentiment'] = sentiment
-            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
+            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": {"sentiment": sentiment}})
     else:
         query_dict["category"] = keywords_file
         query_dict["source_website"] = source_en
@@ -69,8 +68,7 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
             text = title  + content168 + summary
             r['text'] = text.decode('utf-8')
             sentiment = diamond_classifier(r)
-            r['sentiment'] = sentiment
-            mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
+            mongo.boatcol.update({"_id": r["_id"]}, {"$set": {"sentiment": sentiment}})
 
     print source_en, keywords_file, count
 

@@ -44,8 +44,8 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
         results = mongo.master_timeline_weibo.find(query_dict)
 
         for r in results:
-            r['sensi'] = cal_sensi(r['text'].encode('utf-8'))
-            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
+            sensi = cal_sensi(r['text'].encode('utf-8'))
+            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": {"sensi": sensi}})
     else:
         query_dict["category"] = keywords_file
         query_dict["source_website"] = source_en
@@ -58,8 +58,8 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
             summary = _encode_utf8(r['summary'])
 
             text = title  + content168 + summary
-            r['sensi'] = cal_sensi(text)
-            mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
+            sensi = cal_sensi(text)
+            mongo.boatcol.update({"_id": r["_id"]}, {"$set": {"sensi": sensi}})
 
     print source_en, keywords_file, count
 

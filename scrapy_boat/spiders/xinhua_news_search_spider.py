@@ -3,6 +3,7 @@
 import re
 import time
 import json
+import sys
 from scrapy import log
 from urllib import quote
 from scrapy import Spider
@@ -19,7 +20,7 @@ class XinhuaNewsSearchSpider(Spider):
 
     def __init__(self, keywords_file):
         self.keywords = []
-        f = open('./source/' + keywords_file)
+        f = open(keywords_file)
         for line in f:
             if '!' in line:
                 strip_no_querys = []
@@ -32,8 +33,6 @@ class XinhuaNewsSearchSpider(Spider):
             self.keywords.append(keywords_para)
         f.close()
 
-        self.start_ts = self.datetime2ts('2014-11-01 00:00:00')
-        self.end_ts = self.datetime2ts('2014-12-01 00:00:00')
         self.source_website = self.name
         self.category = keywords_file
 
@@ -41,7 +40,6 @@ class XinhuaNewsSearchSpider(Spider):
         for keyword in self.keywords:
             page = 1
             search_url = SEARCH_URL.format(keyword=keyword, page=page)
-            log.msg(search_url)
             request = Request(search_url)
             request.meta['keyword'] = keyword
             request.meta['page'] = page
@@ -56,68 +54,52 @@ class XinhuaNewsSearchSpider(Spider):
         results = []
         resp = response.body
 
-        page_next, items = self.resp2items(resp)
+        items = self.resp2items(resp)
         results.extend(items)
 
-        if page_next:
-            search_url = SEARCH_URL.format(keyword=keyword, page=page)
-            log.msg(search_url)
-            request = Request(search_url)
-            request.meta['keyword'] = keyword
-            request.meta['page'] = page
+        # if page_next:
+        # search_url = SEARCH_URL.format(keyword=keyword, page=page)
+        # request = Request(search_url)
+        # request.meta['keyword'] = keyword
+        # request.meta['page'] = page
 
-            results.append(request)
+        # results.append(request)
+
 
         return results
 
     def resp2items(self, resp):
+        reload(sys)  
+        sys.setdefaultencoding('utf8')
         page_next = False
-        results = []
+        results = [] 
         soup = BeautifulSoup(resp)
-
-        # page
-        # long_page = soup.find('div', {'class': 'long-pages'})
-        # if long_page 
-
-        search_list = soup.find('div', {'class': 'middle-c'})
+        search_list = soup.find('div',{'id':'extresult'})
         search_results = search_list.findAll('div', {'align': 'left'})
         for result in search_results:
             span = result.find('span',{'class':'style1d'})
             if span:
                 span_a = span.find('a')
                 url = span_a.get('href')
-                log.msg(url)
-                # post_id = re.search(r'bbs.tianya.cn\/(.*?)\.shtml', url).group(1)
-                # post_id = re.search(r'http://news.xinhuanet.com/comments\/(.*?)\.htm', url).group(1)
-                split_underline = url.split('_')
-                split_point = split_underline[1].split('.')
-                post_id = split_point[0]
                 title = span_a.text
 
-            source_datatime = result.find('span',{'class':'style2a'})
-            if source_datatime:
-                split_space = source_datatime.split('  ')
-                source = split_space[0]
-                datetime = split_space[1]
+            source_datetime = result.find('span',{'class':'style2a'})
+            # <span class="style2a">新华网  2002-10-11 10:17 </span>
+            log.msg(str(source_datetime))
+            if source_datetime:
+                source = re.search(r'<span class="style2a">(.*?)\d{1,4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2} </span>', str(source_datetime)).group(1)               
+                datetime = re.search(r'<span class="style2a">.*?(\d{1,4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}) </span>', str(source_datetime)).group(1)
+                log.msg(str(source))
+                log.msg(str(datetime))
                 timestamp = self.datetimeshort2ts(datetime)
 
             summary = result.find('span',{'class':'cc'})
             if len(summary):
                 summary = summary.text
-                # source_as = source_p.findAll('a')
-                # source_website_url = source_as[0].get('href')
-                # source_website_name = source_as[0].text
-                # user_url = source_as[1].get('href')
-                # user_name = source_as[1].text
-
-                # datetime_replies = source_p.findAll('span')
-                # datetime, replies = datetime_replies
-                # datetime = datetime.text
-                # timestamp = self.datetimeshort2ts(datetime)
-                # replies = replies.text
+                log.msg(str(summary))
                 source_website = self.source_website
                 category = self.category
-                xinhua_item = (post_id, title, url, source, summary, timestamp, datetime,source_website,category)
+                xinhua_item = (title, url, source, summary, timestamp, datetime,source_website,category)
                 item = ScrapyBoatItem()
                 keys = ScrapyBoatItem.RESP_ITER_KEYS_XINHUA_NEWS
                 for key in keys:
@@ -131,4 +113,4 @@ class XinhuaNewsSearchSpider(Spider):
         return int(time.mktime(time.strptime(date, '%Y-%m-%d %H:%M:%S')))
 
     def datetimeshort2ts(self, date):
-        return int(time.mktime(time.strptime(date, '%Y-%m-%d')))
+        return int(time.mktime(time.strptime(date, '%Y-%m-%d %H:%M')))

@@ -42,22 +42,27 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
         results = mongo.master_timeline_weibo.find(query_dict)
 
         for r in results:
-            r['hot'] = r['reposts_count']
-            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
+            hot = r['reposts_count']
+            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": {"hot": hot}})
+
     else:
         query_dict["category"] = keywords_file
         query_dict["source_website"] = source_en
-        query_dict["relative_news"] = None
+        # query_dict["relative_news"] = None
         count = mongo.boatcol.find(query_dict).count()
         results = mongo.boatcol.find(query_dict)
 
         for r in results:
-            t_weight = 0
-            relative_news = mongo.boatcol.find({"relative_news.id": r['id']})
-            for rr in relative_news:
-                t_weight += get_media_weight(rr["user_name"])
-            r['hot'] = t_weight
-            mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
+            if not r["relative_news"]:
+                t_weight = 0
+                relative_news = mongo.boatcol.find({"relative_news.id": r['id']})
+                for rr in relative_news:
+                    t_weight += get_media_weight(rr["user_name"])
+                hot = t_weight
+            else:
+                t_weight = get_media_weight(r["user_name"])
+                hot = t_weight
+            mongo.boatcol.update({"_id": r["_id"]}, {"$set": {"hot": hot}})
 
     print source_en, keywords_file, count
 

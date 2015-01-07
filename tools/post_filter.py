@@ -89,12 +89,12 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
         for r in results:
             hit = keywords_hit(_encode_utf8(r['text']), hit_keywords)
             if hit:
-                r['keywords_hit'] = True
+                keywords_hit_tag = True
                 hit_count += 1
             else:
-                r['keywords_hit'] = False
+                keywords_hit_tag = False
 
-            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
+            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": {"keywords_hit": keywords_hit_tag}})
     else:
         query_dict["category"] = keywords_file
         query_dict["source_website"] = source_en
@@ -110,12 +110,12 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
             text = title  + content168 + summary
             hit = keywords_hit(text, hit_keywords)
             if hit:
-                r['keywords_hit'] = True
+                keywords_hit_tag = True
                 hit_count += 1
             else:
-                r['keywords_hit'] = False
+                keywords_hit_tag = False
 
-            mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
+            mongo.boatcol.update({"_id": r["_id"]}, {"$set": {"keywords_hit": keywords_hit_tag}})
 
     print source_en, keywords_file, count, hit_count
 

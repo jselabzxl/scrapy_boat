@@ -49,8 +49,8 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
         if len(wordnet_results):
             results = get_text_net(flag, inputs, wordnet_results)
             for weight, r in results:
-                r['rel_score'] = weight
-                mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
+                rel_score = weight
+                mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": {"rel_score": rel_score}})
 
     else:
         query_dict["category"] = keywords_file
@@ -72,8 +72,8 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
         wordnet_results = word_net(inputs)
         results = get_text_net(flag, inputs, wordnet_results)
         for weight, r in results:
-            r['rel_score'] = weight
-            mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
+            rel_score = weight
+            mongo.boatcol.update({"_id": r["_id"]}, {"$set": {"rel_score": rel_score}})
 
     print source_en, keywords_file, count
 

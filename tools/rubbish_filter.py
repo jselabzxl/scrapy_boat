@@ -63,11 +63,11 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
         for idx, r in enumerate(rs):
             if rel[idx] == 1:
                 rel_count += 1
-                r['rubbish'] = False
+                rubbish = False
             else:
-                r['rubbish'] = True
+                rubbish = True
             
-            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": r})
+            mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": {"rubbish": rubbish}})
     else:
         query_dict["category"] = keywords_file
         query_dict["source_website"] = source_en
@@ -95,11 +95,11 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
         for idx, r in enumerate(rs):
             if rel[idx] == 1:
                 rel_count += 1
-                r['rubbish'] = False
+                rubbish = False
             else:
-                r['rubbish'] = True
+                rubbish = True
             
-            mongo.boatcol.update({"_id": r["_id"]}, {"$set": r})
+            mongo.boatcol.update({"_id": r["_id"]}, {"$set": {"rubbish": rubbish}})
 
     print source_en, keywords_file, count, rel_count
 

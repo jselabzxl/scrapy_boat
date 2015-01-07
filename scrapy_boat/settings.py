@@ -17,11 +17,11 @@ NEWSPIDER_MODULE = 'scrapy_boat.spiders'
 #USER_AGENT = 'scrapy_boat (+http://www.yourdomain.com)'
 
 ITEM_PIPELINES = [
-    #'scrapy_boat.pipelines.MongodbPipeline'
+    'scrapy_boat.pipelines.MongodbPipeline'
 ]
 
 DOWNLOADER_MIDDLEWARES = {
-    'scrapy_boat.middleware.WebkitDownloader': 1
+    #'scrapy_boat.middleware.WebkitDownloader': 1
 }
 
 BOAT_HOST = "219.224.135.46"

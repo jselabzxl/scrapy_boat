@@ -19,9 +19,9 @@ def _encode_utf8(us):
 
     return us
 
-WEIBO_KEYS = ['id', 'text', 'timestamp', 'created_at', 'uid', 'source_website', 'source_category', 'reposts_count', 'comments_count', 'attitudes_count', 'hot', 'rel_score', 'sensi']
+WEIBO_KEYS = ['id', 'text', 'timestamp', 'created_at', 'uid', 'source_website', 'source_category', 'reposts_count', 'comments_count', 'attitudes_count', 'hot', 'rel_score', 'sensi', 'sentiment']
 
-NEWS_KEYS = ['id', 'title', 'url', 'summary', 'timestamp', 'datetime', 'user_name', 'source_website', 'category', 'content168', 'hot', 'rel_score', 'sensi']
+NEWS_KEYS = ['id', 'title', 'url', 'summary', 'timestamp', 'datetime', 'user_name', 'source_website', 'category', 'content168', 'hot', 'rel_score', 'sensi', 'sentiment']
 
 def sheqi_rec(sort_field='hot'):
     query_dict = {
@@ -66,7 +66,7 @@ def sheqi_rec(sort_field='hot'):
 
     query_dict["$or"] = or_query_news_dict
     del query_dict["same_rubbish_" + sort_field]
-    query_dict["same_rubbish" + sort_field] = False
+    query_dict["same_rubbish_" + sort_field] = False
     count = mongo.boatcol.find(query_dict).count()
     print "sheqi news candidate %s count: " % sort_field, count
     results = mongo.boatcol.find(query_dict).sort(sort_field, pymongo.DESCENDING)
@@ -130,7 +130,7 @@ def domain_rec(sort_field='hot'):
 
     query_dict["$or"] = or_query_news_dict
     del query_dict["same_rubbish_" + sort_field]
-    query_dict["same_rubbish" + sort_field] = False
+    query_dict["same_rubbish_" + sort_field] = False
     count = mongo.boatcol.find(query_dict).count()
     print "domain news candidate %s count: " % sort_field, count
     results = mongo.boatcol.find(query_dict).sort(sort_field, pymongo.DESCENDING)
@@ -226,7 +226,7 @@ def enemy_rec(sort_field='hot'):
 
     query_dict["$or"] = or_query_news_dict
     del query_dict["same_rubbish_" + sort_field]
-    query_dict["same_rubbish" + sort_field] = False
+    query_dict["same_rubbish_" + sort_field] = False
     count = mongo.boatcol.find(query_dict).count()
     print "enemy news candidate %s count: " % sort_field, count
     results = mongo.boatcol.find(query_dict).sort(sort_field, pymongo.DESCENDING)

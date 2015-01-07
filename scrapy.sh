@@ -1,5 +1,5 @@
-export START_DATETIME_SCRAPY_BOAT="2014-11-29 00:00:00"
-export END_DATETIME_SCRAPY_BOAT="2014-12-06 00:00:00"
+export START_DATETIME_SCRAPY_BOAT="2014-12-13 00:00:00"
+export END_DATETIME_SCRAPY_BOAT="2014-12-20 00:00:00"
 echo "$START_DATETIME_SCRAPY_BOAT"
 echo "$END_DATETIME_SCRAPY_BOAT"
 scrapy crawl baidu_ns_search -a keywords_file='keywords_corp_baidu.txt' -a start_datetime="$START_DATETIME_SCRAPY_BOAT" -a end_datetime="$END_DATETIME_SCRAPY_BOAT" --loglevel=INFO

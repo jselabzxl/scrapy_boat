@@ -1,10 +1,10 @@
-python post_filter.py
-python rubbish_filter.py
-python cut_word.py
-python sentiment_cal.py
-python stat.py
-python hot_sort.py
-python rel_sort.py
-python sensitive_sort.py
-python same_filter.py
-python recommend.py
+python post_filter.py >> run.log
+python rubbish_filter.py >> run.log
+python cut_word.py >> run.log
+python sentiment_cal.py >> run.log
+python stat.py >> run.log
+python hot_sort.py >> run.log
+python rel_sort.py >> run.log
+python sensitive_sort.py >> run.log
+python same_filter.py >> run.log
+python recommend.py >> run.log

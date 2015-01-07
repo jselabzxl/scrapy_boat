@@ -81,6 +81,9 @@ class BaiduNsSearchSpider(Spider):
     def datetime2ts(self, date):
         return int(time.mktime(time.strptime(date, '%Y-%m-%d %H:%M:%S')))
 
+    def datetimeshort2ts(self, date):
+        return int(time.mktime(time.strptime(date, '%Y-%m-%d %H:%M')))
+
     def ts2date(self, ts):
         return time.strftime('%Y-%m-%d', time.localtime(ts))
 
@@ -108,9 +111,15 @@ class BaiduNsSearchSpider(Spider):
                     summary_div = li.find('div', {'class': 'c-summary c-row c-gap-top-small'})
 
                 author_div = summary_div.find('p', {'class': 'c-author'})
-                author = str(author_div).split('&nbsp;&nbsp;')[0].strip('<p class="c-author">').decode('utf-8')
-                datetime = str(author_div).split('&nbsp;&nbsp;')[1].strip('</p>').replace('  ', ' ')
-                timestamp = self.datetime2ts(datetime)
+                author_div_splits = str(author_div).split('&nbsp;&nbsp;')
+                if len(author_div_splits) == 1:
+                    author = None
+                    datetime = author_div_splits[0].lstrip('<p class="c-author">').rstrip('</p>').replace('  ', ' ')
+                else:
+                    author = author_div_splits[0].strip('<p class="c-author">').decode('utf-8')
+                    datetime = author_div_splits[1].strip('</p>').replace('  ', ' ')
+
+                timestamp = self.datetimeshort2ts(datetime)
                 date = self.ts2date(timestamp)
                 summary = re.search(r'</p>(.*?)<a', str(summary_div)).group(1).decode('utf-8').replace('<em>', '').replace('</em>', '')
 
