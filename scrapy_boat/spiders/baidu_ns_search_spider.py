@@ -42,7 +42,6 @@ class BaiduNsSearchSpider(Spider):
     def start_requests(self):
         for keyword in self.keywords:
             search_url = self.get_search_url(0, keyword, self.start_ts, self.end_ts, self.page_count)
-            log.msg(search_url)
             request = Request(search_url)
 
             yield request
@@ -160,7 +159,6 @@ class BaiduNsSearchSpider(Spider):
             if len(n_as) > 0:
                 if n_as[-1].text.replace('&gt;', '') == u'下一页':
                     search_url = HOST_URL + n_as[-1].get('href')
-                    log.msg(search_url)
                     request = Request(search_url, callback=self.parse)
                     if base_item:
                         request.meta['relative_news'] = base_item
