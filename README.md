@@ -11,3 +11,5 @@ usage:
 4. cd scrapy_boat/tools/
 5. 修改utils.py中对应的起止日期
 6. ./calculate.sh
+
+http://www.guguncube.com/2733/python-spynner-installation-in-ubuntu
