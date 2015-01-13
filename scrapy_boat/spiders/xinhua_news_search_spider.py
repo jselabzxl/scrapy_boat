@@ -84,19 +84,14 @@ class XinhuaNewsSearchSpider(Spider):
                 title = span_a.text
 
             source_datetime = result.find('span',{'class':'style2a'})
-            # <span class="style2a">新华网  2002-10-11 10:17 </span>
-            log.msg(str(source_datetime))
             if source_datetime:
                 source = re.search(r'<span class="style2a">(.*?)\d{1,4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2} </span>', str(source_datetime)).group(1)               
                 datetime = re.search(r'<span class="style2a">.*?(\d{1,4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}) </span>', str(source_datetime)).group(1)
-                log.msg(str(source))
-                log.msg(str(datetime))
                 timestamp = self.datetimeshort2ts(datetime)
 
             summary = result.find('span',{'class':'cc'})
             if len(summary):
                 summary = summary.text
-                log.msg(str(summary))
                 source_website = self.source_website
                 category = self.category
                 xinhua_item = (title, url, source, summary, timestamp, datetime,source_website,category)

@@ -45,7 +45,6 @@ class XinhuaBbsSearchSpider(Spider):
         for keyword in self.keywords:
             page = 1
             search_url = SEARCH_URL.format(keyword=keyword, page=page, start_datetimeshort=self.start_datetimeshort, end_datetimeshort=self.end_datetimeshort)
-            log.msg(search_url)
             request = Request(search_url)
             request.meta['keyword'] = keyword
             request.meta['page'] = page
@@ -69,7 +68,6 @@ class XinhuaBbsSearchSpider(Spider):
         if page_next:
             page += 1
             search_url = SEARCH_URL.format(keyword=keyword, page=page, start_datetimeshort=start, end_datetimeshort=end)
-            log.msg(search_url)
             request = Request(search_url)
             request.meta['keyword'] = keyword
             request.meta['page'] = page

@@ -41,7 +41,6 @@ class TianyaBbsSearchSpider(Spider):
         for keyword in self.keywords:
             page = 1
             search_url = SEARCH_URL.format(keyword=keyword, page=page)
-            log.msg(search_url)
             request = Request(search_url)
             request.meta['keyword'] = keyword
             request.meta['page'] = page
@@ -61,7 +60,6 @@ class TianyaBbsSearchSpider(Spider):
 
         if page_next:
             search_url = SEARCH_URL.format(keyword=keyword, page=page)
-            log.msg(search_url)
             request = Request(search_url)
             request.meta['keyword'] = keyword
             request.meta['page'] = page

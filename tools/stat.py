@@ -1,10 +1,15 @@
 #-*-coding=utf-8-*-
 
+import os
 import csv
 import time
 import collections
 from xapian_case.utils import load_scws, cut
 from utils import START_DATETIME, END_DATETIME, _default_mongo, get_module_keywords, START_TS, END_TS
+
+result_path = "./%s-%s/" % (START_DATETIME, END_DATETIME)
+if not os.path.exists(result_path):
+    os.mkdir(result_path)
 
 s = load_scws()
 
@@ -148,7 +153,7 @@ def sheqi_stat():
         except KeyError:
             source_daily_dict["新闻"][r["date"]] = 1
 
-    fw = csv.writer(open('sheqi_author_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    fw = csv.writer(open(result_path + 'sheqi_author_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     results = sorted(author_dict.iteritems(), key=lambda(k, v): v, reverse=True)
     for k, v in results:
         if k == "":
@@ -165,25 +170,25 @@ def sheqi_stat():
                 except KeyError:
                     corp_dict[keyword] = 1
 
-    fw = csv.writer(open('sheqi_gongsi_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    fw = csv.writer(open(result_path + 'sheqi_gongsi_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     results = sorted(corp_dict.iteritems(), key=lambda(k, v): v, reverse=True)
     for k, v in results:
         if k == "":
             continue
         fw.writerow((_encode_utf8(k), v))
 
-    fw = csv.writer(open('sheqi_source_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    fw = csv.writer(open(result_path + 'sheqi_source_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     for source, daily_dict in source_daily_dict.iteritems():
         for date, count in daily_dict.iteritems():
             fw.writerow((_encode_utf8(source), date, count))
 
-    fw = csv.writer(open('sheqi_sentiment_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    fw = csv.writer(open(result_path + 'sheqi_sentiment_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     for sentiment, count in sentiment_dict.iteritems():
         fw.writerow((sentiment, count))
 
     ct = collections.Counter(total_keywords_list)
     keywords_results = ct.most_common(50)
-    fw = csv.writer(open('sheqi_keywords_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    fw = csv.writer(open(result_path + 'sheqi_keywords_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     for keyword, count in keywords_results:
         fw.writerow((_encode_utf8(keyword), count))
 
@@ -268,7 +273,7 @@ def enemy_stat():
                 except KeyError:
                     corp_dict[keyword] = hot
 
-    fw = csv.writer(open('enemy_gongsi_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    fw = csv.writer(open(result_path + 'enemy_gongsi_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     results = sorted(corp_dict.iteritems(), key=lambda(k, v): v, reverse=True)
     for k, v in results:
         if k == "":
@@ -277,7 +282,7 @@ def enemy_stat():
 
     ct = collections.Counter(total_keywords_list)
     keywords_results = ct.most_common(50)
-    fw = csv.writer(open('enemy_keywords_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    fw = csv.writer(open(result_path + 'enemy_keywords_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     for keyword, count in keywords_results:
         fw.writerow((_encode_utf8(keyword), count))
 
@@ -362,7 +367,7 @@ def friends_stat():
                 except KeyError:
                     corp_dict[keyword] = hot
 
-    fw = csv.writer(open('friends_gongsi_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    fw = csv.writer(open(result_path + 'friends_gongsi_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     results = sorted(corp_dict.iteritems(), key=lambda(k, v): v, reverse=True)
     for k, v in results:
         if k == "":
@@ -371,7 +376,7 @@ def friends_stat():
 
     ct = collections.Counter(total_keywords_list)
     keywords_results = ct.most_common(50)
-    fw = csv.writer(open('friends_keywords_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    fw = csv.writer(open(result_path + 'friends_keywords_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     for keyword, count in keywords_results:
         fw.writerow((_encode_utf8(keyword), count))
 
@@ -430,7 +435,7 @@ def domain_stat():
 
     ct = collections.Counter(total_keywords_list)
     keywords_results = ct.most_common(50)
-    fw = csv.writer(open('domain_keywords_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
+    fw = csv.writer(open(result_path + 'domain_keywords_stat_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
     for keyword, count in keywords_results:
         fw.writerow((_encode_utf8(keyword), count))
 

@@ -2,12 +2,14 @@
 """search_spider"""
 
 import time
+import math
 from scrapy import log
 import simplejson as json
 from scrapy.http import Request
 from scrapy.conf import settings
 from scrapy.spider import BaseSpider
 from scrapy_boat.items import WeiboItem, UserItem
+from scrapy_boat.middlewares import UnknownResponseError
 
 API_SERVER_HOST = settings.get('API_SERVER_HOST', None)
 API_SERVER_PORT = settings.get('API_SERVER_PORT', None)
@@ -50,16 +52,25 @@ class WeiboApiSearchSpider(BaseSpider):
         resp = json.loads(response.body)
         results = []
 
+        if 'statuses' not in resp:
+            raise UnknownResponseError
+
+        total_number = resp['total_number']
+        total_pages = math.ceil(float(total_number) / 50.0)
+        if total_pages > 20:
+            total_pages = 20
+
         for status in resp['statuses']:
             items = self.resp2items(status)
             results.extend(items)
 
         page += 1
-        request = Request(BASE_URL.format(keywords=keywords, page=page), headers=None)
-        request.meta['page'] = page
-        request.meta['keywords'] = keywords
+        if page <= total_pages:
+            request = Request(BASE_URL.format(keywords=keywords, page=page), headers=None)
+            request.meta['page'] = page
+            request.meta['keywords'] = keywords
 
-        results.append(request)
+            results.append(request)
 
         return results
 

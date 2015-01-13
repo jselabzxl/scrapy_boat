@@ -43,6 +43,8 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
 
         for r in results:
             hot = r['reposts_count']
+            if hot == 0:
+                hot = 1
             mongo.master_timeline_weibo.update({"_id": r["_id"]}, {"$set": {"hot": hot}})
 
     else:
@@ -58,10 +60,12 @@ for bankuai, lanmu, source, source_en, keywords_file in module_keywords:
                 relative_news = mongo.boatcol.find({"relative_news.id": r['id']})
                 for rr in relative_news:
                     t_weight += get_media_weight(rr["user_name"])
-                hot = t_weight
             else:
                 t_weight = get_media_weight(r["user_name"])
+            if t_weight > 0:
                 hot = t_weight
+            else:
+                hot = 1
             mongo.boatcol.update({"_id": r["_id"]}, {"$set": {"hot": hot}})
 
     print source_en, keywords_file, count

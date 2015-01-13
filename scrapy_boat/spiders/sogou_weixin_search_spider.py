@@ -44,7 +44,6 @@ class SogouWeixinSearchSpider(Spider):
         page = 1
         for keyword in self.keywords:
             search_url = self.get_search_url(keyword, page)
-            log.msg(search_url)
             request = Request(search_url)
             request.meta['page'] = page
             request.meta['keyword'] = keyword
@@ -63,7 +62,6 @@ class SogouWeixinSearchSpider(Spider):
         if page_next:
             page += 1
             search_url = self.get_search_url(keyword, page)
-            log.msg(search_url)
             request = Request(search_url)
             request.meta['page'] = page
             request.meta['keyword'] = keyword

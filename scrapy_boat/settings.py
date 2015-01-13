@@ -16,6 +16,10 @@ NEWSPIDER_MODULE = 'scrapy_boat.spiders'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'scrapy_boat (+http://www.yourdomain.com)'
 
+SPIDER_MIDDLEWARES = {
+    'scrapy_boat.middlewares.RetryErrorResponseMiddleware': 940
+}
+
 ITEM_PIPELINES = [
     'scrapy_boat.pipelines.MongodbPipeline'
 ]
@@ -32,4 +36,5 @@ WEIBO_COLLECTION = "master_timeline_weibo"
 USER_COLLECTION = "master_timeline_user"
 API_SERVER_HOST = "219.224.135.46"
 API_SERVER_PORT = 9115
+RETRY_TIMES = 3
 
