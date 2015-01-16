@@ -33,7 +33,10 @@ def get_module_keywords():
 def datetime2ts(date):
     return int(time.mktime(time.strptime(date, '%Y-%m-%d %H:%M:%S')))
 
-START_DATETIME = "2015-01-03 00:00:00"
-END_DATETIME = "2015-01-10 00:00:00"
+def ts2datetime(timestamp):
+    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(timestamp))
+
+START_DATETIME = "2015-01-10 00:00:00"
+END_DATETIME = "2015-01-17 00:00:00"
 START_TS = datetime2ts(START_DATETIME)
 END_TS = datetime2ts(END_DATETIME)

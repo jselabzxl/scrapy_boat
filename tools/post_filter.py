@@ -2,7 +2,8 @@
 """关键词精炼
 """
 
-from utils import _default_mongo, get_module_keywords, START_TS, END_TS
+import time
+from utils import _default_mongo, get_module_keywords, START_TS, END_TS, ts2datetime
 
 
 def keywords_hit(text, hit_keywords):
@@ -64,7 +65,7 @@ def get_keywords(file_name):
 
     return hit_keywords
 
-print "post filter begins..."
+print "[%s] post filter begins..." % ts2datetime(int(time.time()))
 
 mongo = _default_mongo()
 

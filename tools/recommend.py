@@ -2,9 +2,10 @@
 
 import os
 import csv
+import time
 import pymongo
 from duplicate import duplicate
-from utils import START_DATETIME, END_DATETIME, _default_mongo, get_module_keywords, START_TS, END_TS
+from utils import START_DATETIME, END_DATETIME, _default_mongo, get_module_keywords, START_TS, END_TS, ts2datetime
 
 result_path = "./%s-%s/" % (START_DATETIME, END_DATETIME)
 if not os.path.exists(result_path):
@@ -251,4 +252,4 @@ if __name__ == "__main__":
     enemy_rec(sort_field='hot')
     enemy_rec(sort_field='rel_score')
     enemy_rec(sort_field='sensi')
-    print "recommend ends..."
+    print "[%s] recommend ends..." % ts2datetime(int(time.time()))
