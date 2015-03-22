@@ -14,6 +14,16 @@ def _default_mongo(host=MONGOD_HOST, port=MONGOD_PORT, usedb='boat'):
     db = getattr(connection, usedb)
     return db
 
+def get_sensi_words():
+    f = open("../source/keywords_sensi.txt")
+
+    words = []
+    for line in f:
+        word = line.strip()
+        words.append(word)
+
+    return words
+    
 def get_module_keywords():
     f = open("../source/keywords_taxnomy.txt")
 
@@ -36,7 +46,7 @@ def datetime2ts(date):
 def ts2datetime(timestamp):
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(timestamp))
 
-START_DATETIME = "2015-01-10 00:00:00"
-END_DATETIME = "2015-01-17 00:00:00"
+START_DATETIME = "2015-01-12 20:00:00"
+END_DATETIME = "2015-03-18 20:00:00"
 START_TS = datetime2ts(START_DATETIME)
 END_TS = datetime2ts(END_DATETIME)
