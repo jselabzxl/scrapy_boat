@@ -3,7 +3,7 @@
 import time
 import pymongo
 
-MONGOD_HOST = '219.224.135.46'
+MONGOD_HOST = '219.224.135.47'
 MONGOD_PORT = 27019
 
 def _default_mongo(host=MONGOD_HOST, port=MONGOD_PORT, usedb='boat'):
