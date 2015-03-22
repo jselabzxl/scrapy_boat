@@ -86,6 +86,9 @@ class BaiduNsSearchSpider(Spider):
     def ts2date(self, ts):
         return time.strftime('%Y-%m-%d', time.localtime(ts))
 
+    def ts2datetime(self, ts):
+        return time.strftime('%Y-%m-%d %H:%M', time.localtime(ts))
+
     def resp2items(self, resp, base_item=None):
         soup = BeautifulSoup(resp)
 
@@ -113,14 +116,30 @@ class BaiduNsSearchSpider(Spider):
                 author_div_splits = str(author_div).split('&nbsp;&nbsp;')
                 if len(author_div_splits) == 1:
                     author = None
-                    datetime = author_div_splits[0].lstrip('<p class="c-author">').rstrip('</p>').replace('  ', ' ')
+                    datetime_replace = author_div_splits[0].lstrip('<p class="c-author">').rstrip('</p>').replace('  ', ' ')
                 else:
                     author = author_div_splits[0].strip('<p class="c-author">').decode('utf-8')
-                    datetime = author_div_splits[1].strip('</p>').replace('  ', ' ')
+                    datetime_replace = author_div_splits[1].strip('</p>')
+                if '小时前' in datetime_replace:
+                    now_ts = time.time()
+                    hour = int(datetime_replace.rstrip('小时前'))
+                    timestamp = now_ts - hour * 3600
+                    datetime = self.ts2datetime(timestamp)
+                elif '分钟前' in datetime_replace:
+                    now_ts = time.time()
+                    minute = int(datetime_replace.rstrip('分钟前'))
+                    timestamp = now_ts - minute * 60
+                    datetime = self.ts2datetime(timestamp)
 
-                timestamp = self.datetimeshort2ts(datetime)
+                else:
+                    datetime_re = datetime_replace.replace('  ', ' ')
+                    datetime_year = datetime_re.replace('年', '-')
+                    datetime_month = datetime_year.replace('月', '-')
+                    datetime = datetime_month.replace('日', '')
+                    timestamp = self.datetimeshort2ts(datetime)
+
                 date = self.ts2date(timestamp)
-                summary = re.search(r'</p>(.*?)<a', str(summary_div)).group(1).decode('utf-8').replace('<em>', '').replace('</em>', '')
+                summary = re.search(r'</p>(.*?)<a', str(summary_div)).group(1).decode('utf-8').replace('<em>', '').replace('</em>', '').replace('<span class="c-info">', '')
 
                 more_same_link = None
                 c_more_link_a =  summary_div.find('a', {'class': 'c-more_link'})
@@ -139,7 +158,6 @@ class BaiduNsSearchSpider(Spider):
 
                 if base_item:
                     item['relative_news'] = base_item
-
                 items.append(item)
 
         # requests and return_items

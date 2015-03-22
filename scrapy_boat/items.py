@@ -23,7 +23,10 @@ class ScrapyBoatItem(Item):
     user_name = Field() # 用户名, 公众帐号名, 中船重工经济研究中心
     source_website = Field() # 来源渠道
     category = Field() # 信息类别
-
+    replies = Field()
+    clicks = Field()
+    website_name = Field()
+    website_url = Field()
     # baidu
     same_news_num = Field() # 相同新闻数
     more_same_link = Field() # 相同新闻链接
@@ -56,7 +59,7 @@ class ScrapyBoatItem(Item):
     RESP_ITER_KEYS_WEIXIN_SEARCH = ['id', 'thumbnail_url', 'title', 'url', 'summary', 'user_url', 'user_name', 'timestamp', 'date', 'datetime', 'source_website', 'category']
     RESP_ITER_KEYS_TIANYA_BBS = ['id', 'title', 'url', 'summary', 'source_from_url', 'source_from_name', 'user_url', 'user_name', 'timestamp', 'date', 'datetime', 'replies', 'source_website', 'category']
     RESP_ITER_KEYS_XINHUA_BBS = ['id', 'title', 'url', 'summary', 'user_url', 'user_name', 'timestamp', 'date', 'datetime','source_website', 'category']
-
+    
     def __init__(self):
         super(ScrapyBoatItem, self).__init__()
         default_none_keys = []
@@ -67,7 +70,8 @@ class ScrapyBoatItem(Item):
         default_none_keys.extend(self.RESP_ITER_KEYS_XINHUA_BBS)
 
         for key in default_none_keys:
-            self.setdefault(key, None)
+            default = self.setdefault(key, None)
+        # print default
 
     def to_dict(self):
         d = {}
@@ -79,20 +83,65 @@ class ScrapyBoatItem(Item):
 
         return d
 
-class ChuanrenItem(Item):
-    post_url = Field()
+class ScrapyRenwuItem(Item):
+    id = Field()
+    url = Field()
     thumbnail_url = Field()
-    post_title = Field()
-    post_summary = Field()
+    title = Field()
+    summary = Field()
     clicks = Field()
     replies = Field()
     website_name = Field()
     website_url = Field()
     user_name = Field()
     user_url = Field()
+    datetime = Field()
+    timestamp = Field()
     date = Field()
+    tag = Field()
+    source_website = Field()
+    RESP_ITER_KEYS_CHUANREN_NEWS = ['id', 'url', 'thumbnail_url', 'title', 'summary', 'clicks', 'replies', 'website_name', 'website_url', 'user_name', 'user_url', 'datetime', 'timestamp', 'date', 'source_website']
+    RESP_ITER_KEYS_HAISHI_NEWS = ['id', 'url', 'thumbnail_url', 'title', 'summary', 'replies', 'tag', 'datetime', 'timestamp', 'date', 'source_website']
+    RESP_ITER_KEYS_GUOCHUAN_NEWS = ['id', 'title', 'url', 'thumbnail_url', 'summary', 'timestamp', 'date', 'datetime', 'source_website']
 
-    RESP_ITER_KEYS = ['post_url', 'thumbnail_url', 'post_title', 'post_summary', 'clicks', 'replies', 'website_name', 'website_url', 'user_name', 'user_url', 'date']
+    def __init__(self):
+        super(ScrapyRenwuItem, self).__init__()
+        default_keys = []
+        default_keys.extend(self.RESP_ITER_KEYS_HAISHI_NEWS)
+        default_keys.extend(self.RESP_ITER_KEYS_GUOCHUAN_NEWS)
+
+        for key in default_keys:
+            value = self.setdefault(key, None)
+
+    def to_dict(self):
+        d = {}
+        for k, v in self.items():
+            if isinstance(v, (ScrapyRenwuItem)):
+                d[k] = v.to_dict()
+            else:
+                d[k] = v
+
+        return d
+
+class ChuanrenItem(Item):
+    id = Field()
+    url = Field()
+    thumbnail_url = Field()
+    title = Field()
+    summary = Field()
+    clicks = Field()
+    replies = Field()
+    website_name = Field()
+    website_url = Field()
+    user_name = Field()
+    user_url = Field()
+    datetime = Field()
+    timestamp = Field()
+    date = Field()
+    source_website = Field()
+
+
+    RESP_ITER_KEYS_CHUANREN_NEWS = ['id', 'url', 'thumbnail_url', 'title', 'summary', 'clicks', 'replies', 'website_name', 'website_url', 'user_name', 'user_url', 'datetime', 'timestamp', 'date', 'source_website']
 
     def to_dict(self):
         d = {}
@@ -103,6 +152,82 @@ class ChuanrenItem(Item):
                 d[k] = v
 
         return d
+
+class HaishiItem(Item):
+    id = Field()
+    url = Field()
+    thumbnail_url = Field()
+    title = Field()
+    summary = Field()
+    replies = Field()
+    tag = Field()
+    datetime = Field()
+    timestamp = Field()
+    date = Field()
+    source_website = Field()
+
+
+    RESP_ITER_KEYS_HAISHI_NEWS = ['id', 'url', 'thumbnail_url', 'title', 'summary', 'replies', 'tag', 'datetime', 'timestamp', 'date', 'source_website']
+    
+    def to_dict(self):
+        d = {}
+        for k, v in self.items():
+            if isinstance(v, (HaishiItem)):
+                d[k] = v.to_dict()
+            else:
+                d[k] = v
+
+        return d
+
+class GuochuanItem(Item):
+    id = Field()
+    title = Field()
+    url = Field()
+    thumbnail_url = Field()
+    summary = Field()
+    timestamp = Field()
+    date = Field()
+    datetime = Field()
+    source_website = Field()
+
+
+    RESP_ITER_KEYS_GUOCHUAN_NEWS = ['id', 'title', 'url', 'thumbnail_url', 'summary', 'timestamp', 'date', 'datetime', 'source_website']
+
+    def to_dict(self):
+        d = {}
+        for k, v in self.items():
+            if isinstance(v, (GuochuanItem)):
+                d[k] = v.to_dict()
+            else:
+                d[k] = v
+
+        return d     
+
+
+class ZhengyiItem(Item):
+    id = Field()
+    title = Field()
+    url = Field()
+    summary = Field()
+    timestamp = Field()
+    date = Field()
+    datetime = Field()
+    source_website = Field()
+    category = Field()
+
+
+    RESP_ITER_KEYS_ZHENGYI = ['id', 'title', 'url', 'summary', 'timestamp', 'date', 'datetime', 'source_website', 'category']
+
+    def to_dict(self):
+        d = {}
+        for k, v in self.items():
+            if isinstance(v, (ZhengyiItem)):
+                d[k] = v.to_dict()
+            else:
+                d[k] = v
+
+        return d        
+
 
 class UserItem(Item):
     """

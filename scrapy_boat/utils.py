@@ -1,19 +1,12 @@
-# -*- coding: utf-8 -*-
+#-*-coding=utf-8-*-
 
 import time
-import redis
-import socket
 import pymongo
-import datetime
-import simplejson as json
 
-MONGOD_HOST = 'localhost'
-MONGOD_PORT = 27017
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6379
+MONGOD_HOST = '219.224.135.46'
+MONGOD_PORT = 27019
 
-
-def _default_mongo(host=MONGOD_HOST, port=MONGOD_PORT, usedb='simple'):
+def _default_mongo(host=MONGOD_HOST, port=MONGOD_PORT, usedb='boat'):
     # 强制写journal，并强制safe
     connection = pymongo.MongoClient(host=host, port=port, j=True, w=1)
     db = connection.admin
@@ -21,23 +14,29 @@ def _default_mongo(host=MONGOD_HOST, port=MONGOD_PORT, usedb='simple'):
     db = getattr(connection, usedb)
     return db
 
+def get_module_keywords():
+    f = open("../source/keywords_taxnomy.txt")
 
-def _default_redis(host=REDIS_HOST, port=REDIS_PORT):
-    return redis.Redis(host, port)
+    results = []
+    count = 0
+    for line in f:
+        if count == 0:
+            count += 1
+            continue
 
+        bankuai, lanmu, source, source_en, keywords_file = line.strip().split()
+        results.append((bankuai, lanmu, source, source_en, keywords_file))
+        count += 1
 
-def datetime2str(dt):
-      time_format = '%Y.%m.%d'
-      return dt.strftime(time_format)
+    return results
 
+def datetime2ts(date):
+    return int(time.mktime(time.strptime(date, '%Y-%m-%d %H:%M:%S')))
 
-def local2unix(time_str):
-    time_format = '%a %b %d %H:%M:%S +0800 %Y'
-    return time.mktime(time.strptime(time_str, time_format))
+def ts2datetime(timestamp):
+    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(timestamp))
 
-
-def localIp():
-    localIP = socket.gethostbyname(socket.gethostname())#得到本地ip
-    print "local ip: %s " % localIP
-    return localIP
-
+START_DATETIME = "2015-02-25 00:00:00"
+END_DATETIME = "2015-02-27 20:00:00"
+START_TS = datetime2ts(START_DATETIME)
+END_TS = datetime2ts(END_DATETIME)

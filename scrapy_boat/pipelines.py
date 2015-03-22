@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 
 # Define your item pipelines here
 #
@@ -11,7 +11,7 @@ import time
 import pymongo
 from scrapy import log
 from utils import _default_mongo
-from items import ChuanrenItem, ScrapyBoatItem, WeiboItem, UserItem
+from items import ChuanrenItem, ScrapyBoatItem, WeiboItem, UserItem, HaishiItem, GuochuanItem, ScrapyRenwuItem, ZhengyiItem
 from twisted.internet.threads import deferToThread
 
 class ScrapyBoatPipeline(object):
@@ -40,22 +40,22 @@ class WeixinCsvPipeline(object):
 
         return item
 
-class ChuanrenCsvPipeline(object):
-    def __init__(self):
-        self.file = open('items.csv', 'w')
+# class ChuanrenCsvPipeline(object):
+#     def __init__(self):
+#         self.file = open('items.csv', 'w')
 
-    def process_item(self, item, spider):
-        csv_writer = csv.writer(self.file)
-        csv_row = []
-        for key in ChuanrenItem.RESP_ITER_KEYS:
-            if isinstance(item[key], unicode):
-                csv_row.append(item[key].encode('utf-8'))
-            else:
-                csv_row.append(item[key])
+#     def process_item(self, item, spider):
+#         csv_writer = csv.writer(self.file)
+#         csv_row = []
+#         for key in ChuanrenItem.RESP_ITER_KEYS_CHUANREN_NEWS:
+#             if isinstance(item[key], unicode):
+#                 csv_row.append(item[key].encode('utf-8'))
+#             else:
+#                 csv_row.append(item[key])
 
-        csv_writer.writerow(csv_row)
+#         csv_writer.writerow(csv_row)
 
-        return item
+#         return item 
 
 class MongodbPipeline(object):
     def __init__(self, db, host, port, collection, user_collection, weibo_collection):
@@ -89,6 +89,16 @@ class MongodbPipeline(object):
             return deferToThread(self.process_weibo, item, spider)
         if isinstance(item, UserItem):
             return deferToThread(self.process_user, item, spider)
+        if isinstance(item, ChuanrenItem):
+            return deferToThread(self.process_chuanren, item, spider)
+        if isinstance(item, HaishiItem):
+            return deferToThread(self.process_haishi, item, spider)
+        if isinstance(item, GuochuanItem):
+            return deferToThread(self.process_guochuan, item, spider)
+        if isinstance(item,ScrapyRenwuItem):
+            return deferToThread(self.process_renwu, item, spider)
+        if isinstance(item,ZhengyiItem):
+            return deferToThread(self.process_zhengyi, item, spider)
 
     def update_boat(self, collection, boat_item):
         updates = {}
@@ -98,6 +108,52 @@ class MongodbPipeline(object):
 
         updates_modifier = {'$set': updates}
         self.db[collection].update({'_id': boat_item['_id']}, updates_modifier)
+
+    def update_chuanren(self, collection, chuanren_item):
+        updates = {}
+        updates['last_modify'] = time.time()
+        for k, v in chuanren_item.iteritems():
+            updates[k] = v
+
+        updates_modifier = {'$set': updates}
+        self.db[collection].update({'_id': chuanren_item['_id']}, updates_modifier)
+
+    def update_haishi(self, collection, haishi_item):
+        updates = {}
+        updates['last_modify'] = time.time()
+        for k, v in haishi_item.iteritems():
+            updates[k] = v
+
+        updates_modifier = {'$set': updates}
+        self.db[collection].update({'_id': haishi_item['_id']}, updates_modifier)
+
+    def update_guochuan(self, collection, guochuan_item):
+        updates = {}
+        updates['last_modify'] = time.time()
+        for k, v in guochuan_item.iteritems():
+            updates[k] = v
+
+        updates_modifier = {'$set': updates}
+        self.db[collection].update({'_id': guochuan_item['_id']}, updates_modifier)
+
+
+    def update_zhengyi(self, collection, zhengyi_item):
+        updates = {}
+        updates['last_modify'] = time.time()
+        for k, v in zhengyi_item.iteritems():
+            updates[k] = v
+
+        updates_modifier = {'$set': updates}
+        self.db[collection].update({'_id': zhengyi_item['_id']}, updates_modifier)
+
+    def update_renwu(self, collection, renwu_item):
+        updates = {}
+        updates['last_modify'] = time.time()
+        for k, v in renwu_item.iteritems():
+            updates[k] = v
+
+        updates_modifier = {'$set': updates}
+        self.db[collection].update({'_id': renwu_item['_id']}, updates_modifier)
 
     def process_boat(self, item, spider):
         boat_item = item.to_dict()
@@ -118,6 +174,116 @@ class MongodbPipeline(object):
                 self.db[self.collection].insert(boat_item)
             except pymongo.errors.DuplicateKeyError:
                 self.update_boat(self.collection, boat_item)
+
+        return item
+
+    def process_chuanren(self, item, spider):       
+        chuanren_item = item.to_dict()
+
+        hit = False
+        if  chuanren_item['id']:
+            chuanren_item['_id'] = chuanren_item['id']
+
+            if self.db[self.collection].find({'_id': chuanren_item['_id']}).count():
+                hit = True
+
+        if hit:
+            self.update_chuanren(self.collection, chuanren_item)
+        else:
+            try:
+                chuanren_item['first_in'] = time.time()
+                chuanren_item['last_modify'] = chuanren_item['first_in']
+                self.db[self.collection].insert(chuanren_item)
+            except pymongo.errors.DuplicateKeyError:
+                self.update_chuanren(self.collection, chuanren_item)
+
+        return item
+
+    def process_renwu(self, item, spider):       
+        renwu_item = item.to_dict()
+
+        hit = False
+        if  renwu_item['id']:
+            renwu_item['_id'] = renwu_item['id']
+
+            if self.db[self.collection].find({'_id': renwu_item['_id']}).count():
+                hit = True
+
+        if hit:
+            self.update_renwu(self.collection, renwu_item)
+        else:
+            try:
+                renwu_item['first_in'] = time.time()
+                renwu_item['last_modify'] = renwu_item['first_in']
+                self.db[self.collection].insert(renwu_item)
+            except pymongo.errors.DuplicateKeyError:
+                self.update_renwu(self.collection, renwu_item)
+
+        return item
+
+    def process_haishi(self, item, spider):       
+        haishi_item = item.to_dict()
+
+        hit = False
+        if  haishi_item['id']:
+            haishi_item['_id'] = haishi_item['id']
+
+            if self.db[self.collection].find({'_id': haishi_item['_id']}).count():
+                hit = True
+
+        if hit:
+            self.update_haishi(self.collection, haishi_item)
+        else:
+            try:
+                haishi_item['first_in'] = time.time()
+                haishi_item['last_modify'] = haishi_item['first_in']
+                self.db[self.collection].insert(haishi_item)
+            except pymongo.errors.DuplicateKeyError:
+                self.update_haishi(self.collection, haishi_item)
+
+        return item
+
+    def process_guochuan(self, item, spider):       
+        guochuan_item = item.to_dict()
+
+        hit = False
+        if  guochuan_item['id']:
+            guochuan_item['_id'] = guochuan_item['id']
+
+            if self.db[self.collection].find({'_id': guochuan_item['_id']}).count():
+                hit = True
+
+        if hit:
+            self.update_guochuan(self.collection, guochuan_item)
+        else:
+            try:
+                guochuan_item['first_in'] = time.time()
+                guochuan_item['last_modify'] = guochuan_item['first_in']
+                self.db[self.collection].insert(guochuan_item)
+            except pymongo.errors.DuplicateKeyError:
+                self.update_guochuan(self.collection, guochuan_item)
+
+        return item
+
+    def process_zhengyi(self, item, spider):       
+        zhengyi_item = item.to_dict()
+
+        hit = False
+        if  zhengyi_item['id']:
+            zhengyi_item['_id'] = zhengyi_item['id']
+
+            if self.db[self.collection].find({'_id': zhengyi_item['_id']}).count():
+                hit = True
+
+        if hit:
+            self.update_zhengyi(self.collection, zhengyi_item)
+        else:
+            try:
+                zhengyi_item['first_in'] = time.time()
+                zhengyi_item['last_modify'] = zhengyi_item['first_in']
+                self.db[self.collection].insert(zhengyi_item)
+            except pymongo.errors.DuplicateKeyError:
+                self.update_zhengyi(self.collection, zhengyi_item)
 
         return item
 

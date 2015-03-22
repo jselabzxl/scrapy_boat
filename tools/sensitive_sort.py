@@ -2,11 +2,13 @@
 """敏感度排序
 """
 
-from utils import _default_mongo, get_module_keywords, START_TS, END_TS
+from utils import _default_mongo, get_sensi_words, \
+        get_module_keywords, START_TS, END_TS
 
 print "sensitive_sort begins..."
 
-sensi_words = []
+sensi_words = get_sensi_words()
+
 def cal_sensi(text):
     w = 0
     for word in sensi_words:

@@ -171,13 +171,14 @@ def get_text_net(flag, weibo_text, word):
             k1,k2 = w[1].split('_')
             if 'title' in wt:
                 title_cal = wt['title'].encode('utf-8')
-                summary_cal = wt['summary'].encode('utf-8')
-                c[str(k)] = c[str(k)] + title_cal.count(str(k1))*w[0] + summary_cal.count(str(k2))*w[0] + summary_cal.count(str(k1))*w[0] + summary_cal.count(str(k2))*w[0]
+                if wt['summary']:
+                    summary_cal = wt['summary'].encode('utf-8')
+                    c[str(k)] = c[str(k)] + title_cal.count(str(k1))*w[0] + summary_cal.count(str(k2))*w[0] + summary_cal.count(str(k1))*w[0] + summary_cal.count(str(k2))*w[0]
             else:
                 c[str(k)] = c[str(k)] + wt['text'].encode('utf-8').count(str(k1))*w[0] + wt['text'].encode('utf-8').count(str(k2))*w[0]
             if w not in w_list:
                 w_list.append(str(w))
-        c[str(k)] = c[str(k)] * float(len(w_list))/float(len(word))
+        c[str(k)] = c[str(k)] * float(len(w_list))/float(len(word)+1)
         news_data[str(k)] = wt
 
     n = len(weibo_text)
