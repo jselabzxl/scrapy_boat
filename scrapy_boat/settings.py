@@ -28,13 +28,13 @@ DOWNLOADER_MIDDLEWARES = {
     #'scrapy_boat.middleware.WebkitDownloader': 1
 }
 
-BOAT_HOST = "219.224.135.46"
+BOAT_HOST = "219.224.135.47"
 BOAT_PORT = 27019
 BOAT_DB = "boat"
 BOAT_COLLECTION = "boatcol"
 WEIBO_COLLECTION = "master_timeline_weibo"
 USER_COLLECTION = "master_timeline_user"
-API_SERVER_HOST = "219.224.135.46"
+API_SERVER_HOST = "219.224.135.47"
 API_SERVER_PORT = 9115
 RETRY_TIMES = 3
 
