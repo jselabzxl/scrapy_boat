@@ -332,101 +332,18 @@ def guochuan_rec(sort_field='timestamp'):
 
         fw.writerow(csvrow)
 
-
-def tiqu():
-    reload(sys)
-    sys.setdefaultencoding('utf-8') 
-    query_dict = {
-        "timestamp": {
-            "$gte": START_TS,
-            "$lt": END_TS
-        },
-        "keywords_hit": True,
-        "rubbish": False,
-        "source_website": "baidu_ns_search",
-    }
-
-    count = mongo.boatcol.find(query_dict).count()
-    print "news candidate count: %s  " % count
-    results = mongo.boatcol.find(query_dict)
-
-    results = [r for r in results]
-
-    for r in results:
-        r['title'] = r['title'].encode('utf-8')
-        r['content'] = r['summary'].encode('utf-8')
-
-    # results = duplicate(results)
-
-    fw = csv.writer(open(result_path + 'news_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
-    fwkey = csv.writer(open(result_path + 'news_keys_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
-    for r in results:
-        csvrow = []
-        keyall = []
-
-        # if r['duplicate'] == False:
-        for key in r:
-            # if key == 'terms': 
-            #     value = []
-            #     value = r['terms'] 
-            #     r['terms'] = []             
-            #     for item in value:                                                            
-            #         r['terms'].append(item.encode('utf-8')) 
-            #         print r['terms']     
-            csvrow.append(_encode_utf8(r[key]))
-            keyall.append(_encode_utf8(key))
-
-        fw.writerow(csvrow)
-        fwkey.writerow(keyall)
-
-    # query_dict = {
-    #     "timestamp": {
-    #         "$gte": START_TS,
-    #         "$lt": END_TS
-    #     },
-    #     "keywords_hit": True,
-    #     "rubbish": False,
-    #     "source_website": "weibo_api_search_spider",
-    # }
-
-    # count = mongo.master_timeline_weibo.find(query_dict).count()
-    # print "weibo candidate  count: %s " % count
-    # results = mongo.master_timeline_weibo.find(query_dict)
-
-    # results = [r for r in results]
-
-    # for r in results:
-    #     r['title'] = ''.encode('utf-8')
-    #     r['content'] = r['text'].encode('utf-8')
-
-    # # results = duplicate(results)
-
-    # fw = csv.writer(open(result_path + 'weibo_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
-    # fwkey = csv.writer(open(result_path + 'weibo_keys_%s_%s.csv' % (START_DATETIME, END_DATETIME), 'wb'), delimiter='^')
-    # for r in results:
-    #     csvrow = []
-    #     keyall = []
-    #     # if r['duplicate'] == False:
-    #     for key in r:
-    #         csvrow.append(_encode_utf8(r[key]))
-    #         keyall.append(_encode_utf8(key))
-
-    #     fw.writerow(csvrow)
-    #     fwkey.writerow(keyall)
-
 if __name__ == "__main__":
     print "recommend begins..."
-    tiqu()
-    # chuanren_rec(sort_field='clicks')
-    # haishi_rec(sort_field='replies')
-    # guochuan_rec(sort_field='timestamp')
-    # sheqi_rec(sort_field='hot')
-    # sheqi_rec(sort_field='rel_score')
-    # sheqi_rec(sort_field='sensi')
-    # domain_rec(sort_field='hot')
-    # domain_rec(sort_field='rel_score')
-    # domain_rec(sort_field='sensi')
-    # enemy_rec(sort_field='hot')
-    # enemy_rec(sort_field='rel_score')
-    # enemy_rec(sort_field='sensi')
+    chuanren_rec(sort_field='clicks')
+    haishi_rec(sort_field='replies')
+    guochuan_rec(sort_field='timestamp')
+    sheqi_rec(sort_field='hot')
+    sheqi_rec(sort_field='rel_score')
+    sheqi_rec(sort_field='sensi')
+    domain_rec(sort_field='hot')
+    domain_rec(sort_field='rel_score')
+    domain_rec(sort_field='sensi')
+    enemy_rec(sort_field='hot')
+    enemy_rec(sort_field='rel_score')
+    enemy_rec(sort_field='sensi')
     print "[%s] recommend ends..." % ts2datetime(int(time.time()))
